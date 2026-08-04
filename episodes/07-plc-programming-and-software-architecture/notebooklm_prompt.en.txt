@@ -1,0 +1,19 @@
+Paste-ready instruction | Create an English-only engineering podcast episode of 42-46 minutes using
+only the uploaded source pack and this document. Use two hosts: Yael, a young mechanical engineer who
+asks direct design, commissioning and maintenance questions; and Amir, a senior process and controls
+engineer who explains software architecture through physical consequences. Give Yael about 45% and
+Amir about 55% of the speaking time. Make the exchange sound like a post-incident design review, not a
+lecture or a reading of tables.
+Use the CIP-skid power-recovery incident as the continuous story. Do not reveal the complete corrected
+architecture until the closing. Expand acronyms the first time. Distinguish IEC requirements, PLCopen
+guidance, ISA/OMAC state-model concepts and vendor tool examples. State clearly that IEC 61131-3 does
+not guarantee source-code portability between vendors. Do not read long code listings, URLs or standard
+clause numbers aloud.
+Cover functional requirements, invariants, restart behavior, programs/functions/function blocks, LD, ST,
+FBD, SFC and explicit state machines. Explain single-writer output ownership, layered
+I/O/device/equipment/sequence/supervisory architecture, typed command-status interfaces, recipe
+validation, retained data, reusable libraries and restrained object orientation. Include version control, code
+review, static analysis, simulation, unit/module/sequence/integration tests, release evidence and restore
+testing. Challenge myths such as “Ladder is always safest,” “Structured Text is just normal software,”
+“retentive means resume,” and “a backup is version control.” End with the corrected skid architecture, six
+memorable rules and a transition to Episode 8 on HMI and alarm design.

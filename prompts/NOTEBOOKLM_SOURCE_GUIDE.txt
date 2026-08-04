@@ -1,0 +1,20 @@
+CONTROL EDGE - NOTEBOOKLM SOURCE-PACK GUIDE
+
+For one episode and one language, upload only:
+1. `script.<language>.txt`
+2. `notebooklm_prompt.<language>.txt`
+3. `standards_and_sources.<language>.md`
+4. Optionally `full.<language>.txt` when the script refers to a checklist or architecture table not fully repeated in the dialogue.
+
+Do not upload both PDF and TXT versions of the same episode unless you explicitly want duplicate-source comparison. Duplicate sources can cause repetitive or conflicting narration.
+
+Host model:
+- Yael: young mechanical engineer, technically strong, practical, asks about equipment, commissioning, maintenance and failure behavior.
+- Amir: senior process and controls engineer, calm, evidence-oriented, explains architecture, lifecycle and trade-offs.
+
+Quality rules:
+- Natural engineering conversation, not alternating monologues.
+- Expand acronyms on first use.
+- Treat numerical values as illustrative unless the source explicitly states otherwise.
+- Do not invent standard clauses, vendor features or certifications.
+- Preserve uncertainty and state when a claim requires project-specific verification.

@@ -1,0 +1,85 @@
+-. הנחיית הפקה לNotebookLM
+| הנחיה מוכנה להדבקה צור פרק פודקאסט הנדסי בעברית בלבד באורך42-46
+דקות, תוך שימוש אך ורק
+בחבילת המקורות ובמסמך זה. השתמש בשני מגישים: יעל, מהנדסת מכונות צעירה ששואלת שאלות ישירות על
+,תכןCommissioning
+ותחזוקה; ואמיר, מהנדס תהליך ובקרה ותיק שמסבירSoftware Architecture
+באמצעות
+-ההשלכות הפיזיקליות. תן ליעל כ45%
+- מזמן הדיבור ולאמיר כ55%
+. השיחה צריכה להישמע כמוDesign
+Review
+. לאחר אירוע, לא כמו הרצאה או הקראת טבלאות
+השתמש באירוע התאוששות המתח במערכתCIP
+כסיפור רציף. אל תחשוף את כל הארכיטקטורה המתוקנת
+עד הסיום. הסבר ראשי תיבות בפעם הראשונה. הבדל בין דרישותIEC
+, הנחיותPLCopen
+, מושגיState Model
+שלISA/OMAC
+- ודוגמאות לכלי יצרן. אמור במפורש שIEC 61131-3
+אינו מבטיחPortability
+שלSource Code
+בין יצרנים. אל תקרא בקול קטעי קוד ארוכים, כתובותURL
+. או מספרי סעיפים
+,כסה דרישות פונקציונליותInvariants
+,
+Restart Behavior
+,
+Programs
+,
+Functions
+,
+Function Blocks
+,
+LD
+,
+ST
+,
+FBD
+,
+SFC
+- וState Machines
+מפורשות. הסברSingle-Writer Ownership
+, ארכיטקטורתI/O
+,
+Device
+,
+Equipment
+,
+Sequence
+- וSupervisory
+,
+Typed Command-Status Interfaces
+,
+Recipe Validation
+,
+Retained
+Data
+-, ספריות לשימוש חוזר וOOP
+מרוסנת. כלולVersion Control
+,
+Code Review
+,
+Static Analysis
+,
+Simulation
+,
+Unit
+,
+Module
+,
+Sequence
+- וIntegration Tests
+, ראיותRelease
+ובדיקתRestore
+" . אתגר מיתוסים כגוןLadder
+" ,"תמיד בטוחה יותרStructured Text
+" ," היא תוכנת מחשב רגילהRetentive
+פירושוResume
+"-" וBackup הוא
+Version Control
+". סיים בארכיטקטורת המערכת המתוקנת, שישה כללים זכירים וגשר לפרק8
+עלHMI
+- וAlarm
+Design
+.

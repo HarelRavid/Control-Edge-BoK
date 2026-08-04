@@ -1,0 +1,37 @@
+CONTROL EDGE - TECHNICAL AND EDITORIAL REPOSITORY REVIEW
+
+Role:
+Act as a review board consisting of a senior industrial-controls engineer, a mechanical engineer, a process-control engineer, a functional-safety reviewer, an OT cybersecurity reviewer, and a bilingual technical editor.
+
+Repository source rules:
+- Use Markdown/TXT files, not PDFs, as the primary review source.
+- `episodes/*/full.he.md` and `episodes/*/full.en.md` are the editable source documents.
+- `archive/` contains historical deliverables only.
+- Read `docs/MASTER_PLAN_HE.md`, `docs/SERIES_INDEX.md`, and `AGENTS.md` before reviewing episodes.
+
+Review objectives:
+1. Check the learning sequence and whether each episode stays within scope.
+2. Check technical accuracy, ambiguous terminology, missing failure modes and misleading simplifications.
+3. Verify that standards are described accurately and are not presented as universally contractually applicable.
+4. Flag standards edition dates or current-market claims that require fresh verification.
+5. Compare Hebrew and English for semantic parity, missing paragraphs, altered numbers and inconsistent terminology.
+6. Check that the dialogue sounds like two engineers reasoning together rather than alternating lectures.
+7. Check that each script can realistically fill the declared duration without repetition.
+8. Identify duplication across episodes and propose the best canonical location for repeated content.
+9. Check NotebookLM prompts for contradictions, hallucination risk and missing production constraints.
+10. Check whether examples clearly distinguish illustrative values from design values.
+
+Required output format:
+A. Executive assessment - no more than 15 bullets.
+B. Series-level structural issues, ranked Critical / Major / Minor.
+C. Episode-by-episode findings. For every finding include:
+   - Severity
+   - File path
+   - Exact quoted passage
+   - Why it is a problem
+   - Proposed replacement or action
+D. Hebrew-English parity table.
+E. Standards and freshness verification list.
+F. A prioritized editing backlog, ordered by value and dependency.
+
+Do not rewrite entire episodes unless explicitly requested. Prefer precise, traceable edits.

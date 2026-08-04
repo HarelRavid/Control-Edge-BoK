@@ -1,0 +1,33 @@
+CONTROL EDGE - UPLOAD TO GITHUB
+
+Recommended repository:
+HarelRavid/Control-Edge-BoK
+Visibility: Private
+
+Method A - from the ZIP folder
+1. In GitHub, create a new empty private repository named Control-Edge-BoK.
+   Do not add a README, license or .gitignore during creation.
+2. Extract Control-Edge-BoK.zip.
+3. Open PowerShell or Git Bash inside the extracted Control-Edge-BoK folder.
+4. Run:
+
+   git init
+   git add .
+   git commit -m "Initial import of Control Edge episodes 1-9"
+   git branch -M main
+   git remote add origin https://github.com/HarelRavid/Control-Edge-BoK.git
+   git push -u origin main
+
+Method B - from the Git bundle
+1. Create the same empty private GitHub repository.
+2. Run:
+
+   git clone Control-Edge-BoK.git.bundle Control-Edge-BoK
+   cd Control-Edge-BoK
+   git remote set-url origin https://github.com/HarelRavid/Control-Edge-BoK.git
+   git push -u origin main
+
+Recommended use after upload:
+- Claude review: provide prompts/CLAUDE_REVIEW_PROMPT.txt and repository access.
+- NotebookLM: upload the script, NotebookLM prompt and standards/source files for one episode and one language.
+- Human editing: edit full.he.md and full.en.md, not files under archive/.

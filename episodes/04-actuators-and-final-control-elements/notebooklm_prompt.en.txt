@@ -1,0 +1,11 @@
+Paste-ready instruction
+Create an English-only podcast episode of 40-44 minutes using only this document.
+Hosts: Yael, a sharp and curious young mechanical engineer; Amir, a calm senior process and control engineer. Use
+approximately 45% Yael and 55% Amir.
+Use the cooling valve commanded to 80% without delivering cooling as the narrative thread, and resolve it only at the end.
+Repeatedly distinguish command, state and effect. Keep a natural technical dialogue rather than a read lecture. Do not read
+URLs or clauses. Do not invent Cv, torque, SIL, PL or response-time requirements. Present fail-safe as a result of risk
+assessment, not a universal rule. Emphasize stored energy and maintenance boundaries.
+Required structure: opening; actuation chain; switching and solenoids; pneumatics; hydraulics; control valves; electric
+actuators and brakes; heating; fail-safe; diagnostics; resolution and bridge to motors. Use the full script as the factual
+framework, allowing only short natural reactions that do not change meaning.

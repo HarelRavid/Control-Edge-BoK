@@ -1,0 +1,231 @@
+{
+  "project": "Control Edge Body of Knowledge",
+  "generated": "2026-08-04",
+  "episodes": [
+    {
+      "number": 1,
+      "slug": "introduction-to-industrial-control",
+      "duration": "35-42 minutes",
+      "languages": {
+        "he": {
+          "full_markdown": "episodes/01-introduction-to-industrial-control/full.he.md",
+          "plain_text": "episodes/01-introduction-to-industrial-control/full.he.txt",
+          "script": "episodes/01-introduction-to-industrial-control/script.he.txt",
+          "notebooklm_prompt": "episodes/01-introduction-to-industrial-control/notebooklm_prompt.he.txt",
+          "word_count_full": 4115,
+          "word_count_script": 2670,
+          "word_count_notebooklm_prompt": 265
+        },
+        "en": {
+          "full_markdown": "episodes/01-introduction-to-industrial-control/full.en.md",
+          "plain_text": "episodes/01-introduction-to-industrial-control/full.en.txt",
+          "script": "episodes/01-introduction-to-industrial-control/script.en.txt",
+          "notebooklm_prompt": "episodes/01-introduction-to-industrial-control/notebooklm_prompt.en.txt",
+          "word_count_full": 4920,
+          "word_count_script": 3247,
+          "word_count_notebooklm_prompt": 320
+        }
+      }
+    },
+    {
+      "number": 2,
+      "slug": "inside-the-industrial-controller",
+      "duration": "40-44 minutes",
+      "languages": {
+        "he": {
+          "full_markdown": "episodes/02-inside-the-industrial-controller/full.he.md",
+          "plain_text": "episodes/02-inside-the-industrial-controller/full.he.txt",
+          "script": "episodes/02-inside-the-industrial-controller/script.he.txt",
+          "notebooklm_prompt": "episodes/02-inside-the-industrial-controller/notebooklm_prompt.he.txt",
+          "word_count_full": 4975,
+          "word_count_script": 3264,
+          "word_count_notebooklm_prompt": 198
+        },
+        "en": {
+          "full_markdown": "episodes/02-inside-the-industrial-controller/full.en.md",
+          "plain_text": "episodes/02-inside-the-industrial-controller/full.en.txt",
+          "script": "episodes/02-inside-the-industrial-controller/script.en.txt",
+          "notebooklm_prompt": "episodes/02-inside-the-industrial-controller/notebooklm_prompt.en.txt",
+          "word_count_full": 6269,
+          "word_count_script": 4295,
+          "word_count_notebooklm_prompt": 224
+        }
+      }
+    },
+    {
+      "number": 3,
+      "slug": "sensors-and-measurement",
+      "duration": "40-44 minutes",
+      "languages": {
+        "he": {
+          "full_markdown": "episodes/03-sensors-and-measurement/full.he.md",
+          "plain_text": "episodes/03-sensors-and-measurement/full.he.txt",
+          "script": "episodes/03-sensors-and-measurement/script.he.txt",
+          "notebooklm_prompt": "episodes/03-sensors-and-measurement/notebooklm_prompt.he.txt",
+          "word_count_full": 4586,
+          "word_count_script": 2588,
+          "word_count_notebooklm_prompt": 204
+        },
+        "en": {
+          "full_markdown": "episodes/03-sensors-and-measurement/full.en.md",
+          "plain_text": "episodes/03-sensors-and-measurement/full.en.txt",
+          "script": "episodes/03-sensors-and-measurement/script.en.txt",
+          "notebooklm_prompt": "episodes/03-sensors-and-measurement/notebooklm_prompt.en.txt",
+          "word_count_full": 6292,
+          "word_count_script": 3880,
+          "word_count_notebooklm_prompt": 242
+        }
+      }
+    },
+    {
+      "number": 4,
+      "slug": "actuators-and-final-control-elements",
+      "duration": "40-44 minutes",
+      "languages": {
+        "he": {
+          "full_markdown": "episodes/04-actuators-and-final-control-elements/full.he.md",
+          "plain_text": "episodes/04-actuators-and-final-control-elements/full.he.txt",
+          "script": "episodes/04-actuators-and-final-control-elements/script.he.txt",
+          "notebooklm_prompt": "episodes/04-actuators-and-final-control-elements/notebooklm_prompt.he.txt",
+          "word_count_full": 3363,
+          "word_count_script": 1794,
+          "word_count_notebooklm_prompt": 168
+        },
+        "en": {
+          "full_markdown": "episodes/04-actuators-and-final-control-elements/full.en.md",
+          "plain_text": "episodes/04-actuators-and-final-control-elements/full.en.txt",
+          "script": "episodes/04-actuators-and-final-control-elements/script.en.txt",
+          "notebooklm_prompt": "episodes/04-actuators-and-final-control-elements/notebooklm_prompt.en.txt",
+          "word_count_full": 4022,
+          "word_count_script": 2471,
+          "word_count_notebooklm_prompt": 151
+        }
+      }
+    },
+    {
+      "number": 5,
+      "slug": "motors-vfds-servos-and-motion-control",
+      "duration": "42-45 minutes",
+      "languages": {
+        "he": {
+          "full_markdown": "episodes/05-motors-vfds-servos-and-motion-control/full.he.md",
+          "plain_text": "episodes/05-motors-vfds-servos-and-motion-control/full.he.txt",
+          "script": "episodes/05-motors-vfds-servos-and-motion-control/script.he.txt",
+          "notebooklm_prompt": "episodes/05-motors-vfds-servos-and-motion-control/notebooklm_prompt.he.txt",
+          "word_count_full": 4926,
+          "word_count_script": 3128,
+          "word_count_notebooklm_prompt": 176
+        },
+        "en": {
+          "full_markdown": "episodes/05-motors-vfds-servos-and-motion-control/full.en.md",
+          "plain_text": "episodes/05-motors-vfds-servos-and-motion-control/full.en.txt",
+          "script": "episodes/05-motors-vfds-servos-and-motion-control/script.en.txt",
+          "notebooklm_prompt": "episodes/05-motors-vfds-servos-and-motion-control/notebooklm_prompt.en.txt",
+          "word_count_full": 6020,
+          "word_count_script": 3943,
+          "word_count_notebooklm_prompt": 215
+        }
+      }
+    },
+    {
+      "number": 6,
+      "slug": "industrial-communication-and-deterministic-networks",
+      "duration": "40-45 minutes",
+      "languages": {
+        "he": {
+          "full_markdown": "episodes/06-industrial-communication-and-deterministic-networks/full.he.md",
+          "plain_text": "episodes/06-industrial-communication-and-deterministic-networks/full.he.txt",
+          "script": "episodes/06-industrial-communication-and-deterministic-networks/script.he.txt",
+          "notebooklm_prompt": "episodes/06-industrial-communication-and-deterministic-networks/notebooklm_prompt.he.txt",
+          "word_count_full": 4932,
+          "word_count_script": 2934,
+          "word_count_notebooklm_prompt": 123
+        },
+        "en": {
+          "full_markdown": "episodes/06-industrial-communication-and-deterministic-networks/full.en.md",
+          "plain_text": "episodes/06-industrial-communication-and-deterministic-networks/full.en.txt",
+          "script": "episodes/06-industrial-communication-and-deterministic-networks/script.en.txt",
+          "notebooklm_prompt": "episodes/06-industrial-communication-and-deterministic-networks/notebooklm_prompt.en.txt",
+          "word_count_full": 5799,
+          "word_count_script": 3567,
+          "word_count_notebooklm_prompt": 143
+        }
+      }
+    },
+    {
+      "number": 7,
+      "slug": "plc-programming-and-software-architecture",
+      "duration": "42-46 minutes",
+      "languages": {
+        "he": {
+          "full_markdown": "episodes/07-plc-programming-and-software-architecture/full.he.md",
+          "plain_text": "episodes/07-plc-programming-and-software-architecture/full.he.txt",
+          "script": "episodes/07-plc-programming-and-software-architecture/script.he.txt",
+          "notebooklm_prompt": "episodes/07-plc-programming-and-software-architecture/notebooklm_prompt.he.txt",
+          "word_count_full": 5021,
+          "word_count_script": 3129,
+          "word_count_notebooklm_prompt": 236
+        },
+        "en": {
+          "full_markdown": "episodes/07-plc-programming-and-software-architecture/full.en.md",
+          "plain_text": "episodes/07-plc-programming-and-software-architecture/full.en.txt",
+          "script": "episodes/07-plc-programming-and-software-architecture/script.en.txt",
+          "notebooklm_prompt": "episodes/07-plc-programming-and-software-architecture/notebooklm_prompt.en.txt",
+          "word_count_full": 5564,
+          "word_count_script": 3589,
+          "word_count_notebooklm_prompt": 235
+        }
+      }
+    },
+    {
+      "number": 8,
+      "slug": "hmi-and-operator-interface-design",
+      "duration": "40-45 minutes",
+      "languages": {
+        "he": {
+          "full_markdown": "episodes/08-hmi-and-operator-interface-design/full.he.md",
+          "plain_text": "episodes/08-hmi-and-operator-interface-design/full.he.txt",
+          "script": "episodes/08-hmi-and-operator-interface-design/script.he.txt",
+          "notebooklm_prompt": "episodes/08-hmi-and-operator-interface-design/notebooklm_prompt.he.txt",
+          "word_count_full": 4290,
+          "word_count_script": 2868,
+          "word_count_notebooklm_prompt": 214
+        },
+        "en": {
+          "full_markdown": "episodes/08-hmi-and-operator-interface-design/full.en.md",
+          "plain_text": "episodes/08-hmi-and-operator-interface-design/full.en.txt",
+          "script": "episodes/08-hmi-and-operator-interface-design/script.en.txt",
+          "notebooklm_prompt": "episodes/08-hmi-and-operator-interface-design/notebooklm_prompt.en.txt",
+          "word_count_full": 5168,
+          "word_count_script": 3516,
+          "word_count_notebooklm_prompt": 264
+        }
+      }
+    },
+    {
+      "number": 9,
+      "slug": "scada-dcs-historian-and-plant-data",
+      "duration": "40-45 minutes",
+      "languages": {
+        "he": {
+          "full_markdown": "episodes/09-scada-dcs-historian-and-plant-data/full.he.md",
+          "plain_text": "episodes/09-scada-dcs-historian-and-plant-data/full.he.txt",
+          "script": "episodes/09-scada-dcs-historian-and-plant-data/script.he.txt",
+          "notebooklm_prompt": "episodes/09-scada-dcs-historian-and-plant-data/notebooklm_prompt.he.txt",
+          "word_count_full": 4515,
+          "word_count_script": 2968,
+          "word_count_notebooklm_prompt": 216
+        },
+        "en": {
+          "full_markdown": "episodes/09-scada-dcs-historian-and-plant-data/full.en.md",
+          "plain_text": "episodes/09-scada-dcs-historian-and-plant-data/full.en.txt",
+          "script": "episodes/09-scada-dcs-historian-and-plant-data/script.en.txt",
+          "notebooklm_prompt": "episodes/09-scada-dcs-historian-and-plant-data/notebooklm_prompt.en.txt",
+          "word_count_full": 5438,
+          "word_count_script": 3688,
+          "word_count_notebooklm_prompt": 262
+        }
+      }
+    }
+  ]
+}

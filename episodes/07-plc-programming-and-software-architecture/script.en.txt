@@ -1,0 +1,306 @@
+00:00-03:30 | Cold open - the pump that remembered the wrong thing
+Amir: A clean-in-place skid is upgraded from one product to three recipes. The software change looks
+modest: new timing values, a few valve selections and a different rinse sequence. During the first power-
+recovery test, the circulation pump starts for less than a second while the outlet valve is still closed. The drive
+trips on pressure, the mechanical seal survives, and the team calls it a commissioning glitch.
+Yael: Less than a second is long enough to be a real physical event. What did the program do?
+Amir: Three different routines could write the pump command. The sequence step number was retentive.
+One ladder rung interpreted that retained step as circulate, another routine was still rebuilding valve status,
+and the recipe manager had not yet confirmed that the loaded data were valid. Every individual rung looked
+reasonable when viewed alone.
+Yael: So the failure was not a syntax error. It was an architecture error.
+Amir: Exactly. The controller executed valid instructions in a bad ownership model. The network from
+Episode 6 delivered every bit on time. The software had no single explicit answer to four questions: who
+owns the output, what state is the equipment in, which data are valid after restart, and what conditions must
+remain true before energy is released.
+Yael: Today we are not asking which language is best in the abstract. We are asking how Ladder, Structured
+Text, Function Block Diagram and Sequential Function Chart can be combined into code that another
+engineer can understand, test and safely change five years later.
+
+Amir: And we will return to the skid at the end with a design that makes the wrong command difficult to
+express, not merely easy to comment.
+03:30-07:30 | Requirements before rungs
+Yael: Automation projects often begin with an I/O list and a programmer opening the engineering tool. What
+must exist before coding?
+Amir: A behavioral model. Define operating modes, equipment states, commands, permissives, interlocks,
+trips, reset rules, restart behavior, manual functions and the boundary to safety systems. For a process unit,
+add the intended sequence, hold points, abnormal transitions and recipe ownership. For a machine, add
+cycle states, recovery paths and what the operator may request in each mode.
+Yael: That sounds like functional design, not software design.
+Amir: They are inseparable. Software cannot compensate for an undefined process response. Consider the
+sentence start the pump when ready. Ready must become an explicit expression: correct valve path proven,
+minimum level, no trip active, drive available, mode allows automatic start, recipe validated, no maintenance
+lockout, and any required safety function healthy. Each condition needs a source, quality and failure
+response.
+Yael: Should we distinguish permissive, interlock and trip?
+Amir: Yes, even if a company uses different words. A permissive allows a start. An interlock may prevent or
+remove a command when a required condition is absent. A trip is usually a latched protective response
+requiring defined reset conditions. The vocabulary must be documented because HMI messages, cause-and-
+effect tables and maintenance procedures depend on it.
+Yael: What is an invariant in this context?
+Amir: A condition that must always be true while a state or action is active. For circulation, an invariant could
+be: if pump command is on, an open flow path must be proven or a bounded transition timer must be running.
+Invariants guide code reviews and tests because they turn vague intent into statements that can be
+challenged.
+Yael: And restart is a requirement, not a default memory setting.
+Amir: Precisely. Decide whether the machine returns to stopped, holds its last state, resumes a validated
+step, or requires operator recovery. Retentive memory is not a continuation strategy. It is only a storage
+mechanism.
+07:30-12:30 | IEC 61131-3 in 2025 - a common language, not identical
+tools
+Yael: Let us establish the standard landscape. What does the current edition of IEC 61131-3 actually define?
+Amir: The fourth edition, published in 2025, specifies the syntax and semantics of a unified suite consisting
+of Structured Text, Ladder Diagram and Function Block Diagram. It also defines Sequential Function Chart
+elements for structuring programs and function blocks, plus configuration elements. Instruction List, which
+older engineers may know from legacy systems, is not part of that current language suite.
+Yael: Does compliance mean I can move a project from any vendor to another vendor and compile it?
+Amir: No. The standard improves common concepts and language semantics, but tools differ in supported
+subsets, libraries, data types, task models, hardware configuration, motion, safety, visualization, diagnostics
+and vendor extensions. Even when syntax imports successfully, behavior and lifecycle evidence still require
+verification.
+Yael: What are the common building blocks beyond the visible language?
+
+Amir: Data types, variables, configurations, resources, tasks and Program Organization Units. POUs include
+programs, function blocks and functions. A function should behave like a calculation without persistent
+instance state. A function block has instance memory and suits a valve, motor, controller or reusable stateful
+behavior. A program coordinates application behavior and is scheduled by the runtime.
+Yael: And IEC TR 61131-8?
+Amir: It provides application and implementation guidance for the languages. IEC 61131-10 defines an XML
+exchange format for IEC 61131-3 projects. That supports tool exchange and version-control workflows, but it
+does not erase vendor-specific semantics or guarantee one-click migration.
+Yael: The 2025 edition also mentions UTF-8 strings.
+Amir: Yes, and that reminds us that controller software handles richer data. But richer language features
+should not tempt us to place every IT-style function inside the real-time control task. Architecture still
+separates deterministic control from reporting, analytics and noncritical services.
+Yael: Then standardize the mental model, and verify the implementation.
+Amir: Exactly. Use the standard as a common engineering grammar, not as a substitute for platform
+documentation and system testing.
+12:30-17:30 | Ladder Diagram - visible power flow and invisible traps
+Yael: Ladder remains the language many electricians and maintenance technicians prefer. What is it
+genuinely good at?
+Amir: Boolean logic that resembles relay circuits: start-stop circuits, permissive chains, interlocks, mode
+selection, alarms and simple device control. The visual path can make an open condition easy to locate
+online. That works when the architecture is disciplined.
+Yael: The phrase when the architecture is disciplined sounds important.
+Amir: Very. Ladder becomes difficult when one coil is written in many places, when latches are used without
+explicit reset ownership, when long branches hide priority, or when sequence state is represented by dozens
+of unrelated bits. The screen may look familiar while the program has no clear behavioral model.
+Yael: Explain the multiple-writer problem using our pump.
+Amir: Suppose Manual, Automatic Sequence and Recovery each contain a rung that writes PumpCmd. The
+final value may depend on scan order or platform rules. A change in one routine can silently override another.
+A better design lets each layer issue a request to one pump module. That module alone owns the physical
+command and resolves mode, permissive, interlock and feedback.
+Yael: What about set and reset coils?
+Amir: They are not forbidden, but every latched state needs a defined owner, reset path, initialization rule
+and diagnostic meaning. A latched bit that survives longer than its requirement becomes hidden memory.
+The software should reveal a state or command source, not force someone to search for the last rung that
+set a coil.
+Yael: Online monitoring can also create false confidence.
+Amir: Yes. A highlighted rung shows current evaluation, not the history that produced a retained bit or timing
+between tasks. It may also hide a physical output fault. Distinguish requested command, controller output,
+field power, actuator state and process effect.
+Yael: Ladder is strongest for transparent decisions, not for storing the entire plant history in contacts.
+Amir: Well put. Keep rungs short enough to explain, name conditions by engineering meaning, and make
+output ownership obvious.
+
+17:30-22:30 | Structured Text - expressive power with real-time
+responsibilities
+Yael: Structured Text looks familiar to engineers who know Pascal, C or Python. Where does it earn its
+place?
+Amir: Calculations, arrays, loops, data conversion, recipe validation, string handling, algorithms, state
+machines and reusable libraries. It expresses complex transformations more compactly than a graphical
+network. A pressure-compensation calculation with ten intermediate values may be clearer as typed
+expressions than as a wall of blocks.
+Yael: What are the common mistakes?
+Amir: Dense code that only the author can read, implicit type conversions, hidden state changes inside
+functions, loops over variable-sized data without considering worst-case execution time, array indexing
+without range protection, mixed engineering units and desktop-style assumptions about exceptions.
+Yael: Give an example of bounded execution.
+Amir: If a periodic task has a ten-millisecond budget, a loop that processes every recipe item must have a
+known maximum. A search that is harmless with twenty records may overrun when configuration grows to
+two thousand. Real-time reviews ask not only whether the result is correct, but what the worst execution path
+is and what happens if input data are malformed.
+Yael: How should units appear in code?
+Amir: Prefer strongly typed structures, meaningful names and explicit conversions. Temperature_C,
+Pressure_bar_g and Duration_ms are more informative than Value1, even if the platform lacks true unit
+types. Centralize scaling at the I/O boundary so internal logic operates in engineering units. Do not scatter
+raw counts and magic constants.
+Yael: Is a CASE statement a good way to build a state machine?
+Amir: It can be excellent if states are enumerated, transitions are explicit, entry actions are controlled, illegal
+states are handled and outputs are derived consistently. It becomes poor when every state writes many
+devices directly and transition conditions are duplicated. The state machine should coordinate modules, not
+bypass them.
+Yael: And comments?
+Amir: Comments should explain why, constraints and assumptions. The code should reveal what. A
+comment saying start pump above M120 adds nothing. A comment explaining that a three-second valve-
+proof delay is based on a validated mechanical travel envelope is useful and should point to the controlled
+requirement.
+22:30-26:30 | Function Block Diagram - signal flow, control and execution
+order
+Yael: Function Block Diagram often appears in process control. What makes it suitable?
+Amir: It represents signal flow and relationships between functions. PID control, filtering, scaling, voting,
+analog conditioning and control-valve logic can be easy to review as connected blocks. A mechanical
+engineer can follow the path from measured variable through validation and controller output to the final
+element.
+Yael: Does the drawing guarantee a left-to-right execution order?
+Amir: Do not assume that from appearance alone. Platforms define network order, block execution and
+feedback handling. Cyclic dependencies need care. The engineer must understand the tool's execution
+model and make dependencies explicit where order matters.
+
+Yael: What causes FBD to become unreadable?
+Amir: Huge sheets, crossing lines, implicit global variables, mixed abstraction levels and blocks with unclear
+side effects. A page containing sensor scaling, mode logic, PID tuning, alarm latching and valve-output
+ownership is not a control diagram; it is an architecture collapse.
+Yael: Then one network should tell one story.
+Amir: Yes. Keep the signal path visible, encapsulate repeated behavior in function blocks, expose status and
+quality, and separate basic control from sequence coordination. FBD is powerful when each block has a clear
+contract.
+Yael: Would you implement every PID loop in a custom block?
+Amir: Usually not. Use proven platform or company libraries, but wrap them where necessary to standardize
+units, modes, tracking, output limits, bumpless transfer, alarms and diagnostics. Reuse should reduce
+variation, not hide critical behavior.
+26:30-31:30 | SFC and state machines - make sequence state explicit
+Yael: Sequential Function Chart is sometimes called a programming language and sometimes not. Which is
+correct?
+Amir: In IEC 61131-3:2025, SFC is a set of elements used to structure the internal organization of programs
+and function blocks. Steps hold state, transitions define when execution moves, and actions use other
+language elements. PLCopen emphasizes that SFC is especially useful for sequential processes and state-
+machine behavior.
+Yael: What does explicit state buy us?
+Amir: Observability and controlled transitions. Instead of guessing which combination of bits means rinsing,
+the program states Rinsing. From that state, only defined transitions are legal: complete, hold, abort or fault.
+Entry and exit behavior can be reviewed, displayed and tested.
+Yael: How detailed should the states be?
+Amir: Detailed enough to represent meaningful equipment behavior, not every scan action. A state should
+have a purpose, entry criteria, active invariants, completion criteria, timeout and abnormal exits. If a state
+exists only to wait one scan, it probably models implementation detail rather than process behavior.
+Yael: What about parallel branches?
+Amir: They can represent concurrent activities, but synchronization must be explicit. If two branches control
+shared equipment, ownership and completion rules must be clear. Elegant-looking parallelism can create a
+race when one branch faults and the other continues.
+Yael: PackML is often mentioned with state models.
+Amir: OMAC PackML and ISA TR88 machine-state work provide common concepts such as stopped,
+starting, execute, holding, held, aborting and aborted. They can improve consistency across machines, but
+the model must be mapped to the actual process and not pasted as a decorative layer over unrelated logic.
+Yael: For our skid, would recipe steps and unit mode be the same state machine?
+Amir: Usually separate them. A unit mode such as Off, Manual, Automatic or Maintenance governs
+permissions. The sequence state describes where the recipe is. Device modules retain their own states.
+Layered state machines prevent one giant chart from owning every detail.
+31:30-36:30 | A maintainable automation architecture
+Yael: Let us build the layers from the terminals upward.
+
+Amir: First, I/O abstraction. Map raw channels, scaling, inversion, quality and simulation at one boundary.
+Second, device modules for pumps, valves, heaters, drives and instruments. Each module owns commands,
+permissives, interlocks, feedback, faults and diagnostics for one device or tightly defined assembly.
+Yael: Third would be equipment modules?
+Amir: Yes. An equipment module coordinates devices to provide a capability: circulation path, dosing,
+heating, positioning or transfer. It requests device actions and exposes compact status. Above that,
+sequence or phase logic coordinates capabilities to execute a recipe or machine cycle. A supervisory layer
+manages modes, production orders, handshakes and HMI-facing summaries.
+Yael: Where does a PID loop belong?
+Amir: Usually in the equipment or basic-control layer, close to the process variable and final element. The
+sequence requests a setpoint and mode; it should not reimplement the controller. This lets the loop remain in
+manual or tracking during sequence transitions without scattering logic across steps.
+Yael: You keep returning to ownership.
+Amir: Because ownership prevents contradictory commands. One module writes each physical output.
+Higher layers send requests through defined interfaces. A pump module may receive AutoRequest,
+ManualRequest and StopRequest, but it resolves them with documented priority and exposes
+CommandSource, Ready, Running, Faulted and NotPermittedReason.
+Yael: That also improves HMI design later.
+Amir: Exactly. The interface can display why a start is blocked without reconstructing logic from dozens of
+tags. It also supports simulation: replace the I/O boundary with a model while preserving module interfaces.
+Yael: What should cross module boundaries?
+Amir: Commands, status, configuration and events with explicit types. Avoid unrestricted access to internal
+variables. A module contract states what the caller may request, what feedback means, what timing
+assumptions exist and how faults are acknowledged.
+36:30-40:30 | Data models, reuse and object orientation without
+architecture theatre
+Yael: Reusable code sounds obviously good. Why does it sometimes make projects harder?
+Amir: Because copied code is called a library, or because a generic block exposes fifty parameters to cover
+every imaginable machine. Reuse works when behavior is stable, interfaces are small, documentation is
+controlled, versions are traceable and the consuming project can test the exact library release.
+Yael: Start with data types.
+Amir: Use enumerations for modes and states, structures for device commands and status, and named
+constants for limits. A recipe should be a validated structure with a version and checksum or equivalent
+integrity method where appropriate, not a loose set of tags. Separate configuration from live state and
+operator-entered values from approved values used by control.
+Yael: Function blocks give us instances. What does object-oriented programming add?
+Amir: Depending on the platform, methods, interfaces, inheritance or properties can improve encapsulation
+and polymorphism. PLCopen has guidance for object orientation in industrial control. But OOP is a tool, not a
+maturity badge. Deep inheritance, dynamic relationships and hidden side effects can make online
+troubleshooting worse.
+Yael: When is an interface useful?
+Amir: When different implementations must present the same contract. A simulated valve and a physical
+valve can implement the same command-status interface. Different drive families can expose a common
+
+equipment-facing API while vendor-specific diagnostics remain inside adapters. This supports substitution
+without pretending the hardware is identical.
+Yael: How should library versions be managed?
+Amir: Semantic versioning can help, but the essential rules are controlled release, dependency recording,
+backward-compatibility policy, migration notes and regression tests. A machine project should know exactly
+which library version produced the downloaded binary. Never update a global library silently across
+commissioned projects.
+Yael: And avoid premature generalization.
+Amir: Yes. First make one design correct and observable. Generalize after comparing real variants. The best
+reusable block standardizes dangerous and repetitive parts while leaving application-specific process logic
+visible.
+40:30-44:00 | Version control, static analysis and tests that survive
+commissioning
+Yael: Automation teams often say the PLC project is backed up. Is that version control?
+Amir: No. A backup preserves a file at one moment. Version control records intentional changes, authorship,
+review, release tags and the relationship between branches. It should let the team answer what changed,
+why, who approved it, which controller received it and how to reproduce the released build.
+Yael: Graphical languages make diffs harder.
+Amir: They can. Use vendor source-control integrations, textual exchange formats where reliable, or
+controlled export formats such as PLCopen XML. But never treat a successful textual merge as proof that the
+control behavior is correct. Compile, analyze and test the resulting project in the target engineering
+environment.
+Yael: What does static analysis contribute?
+Amir: It finds patterns before runtime: unused variables, implicit conversions, unreachable code, naming
+violations, excessive complexity, suspicious assignments, multiple writes or library-rule violations, depending
+on the tool. CODESYS, for example, provides rule- and metric-based static analysis. Similar capabilities exist
+in other ecosystems. The rule set should be tailored and deviations reviewed rather than blindly suppressed.
+Yael: Then tests. What is a useful hierarchy?
+Amir: Unit tests for functions and function blocks; module tests with simulated I/O; sequence tests covering
+normal, hold, abort and recovery paths; integration tests with real drives, networks and instruments; and site
+acceptance tests under actual process constraints. Simulation is excellent for breadth, but it cannot
+reproduce every physical timing, wiring fault or vendor-firmware behavior.
+Yael: Our power-loss incident should become a test family.
+Amir: Exactly. Remove power or simulate restart in every meaningful sequence state. Vary whether valve
+feedback is stale, the recipe is invalid, the drive is unavailable or the operator requests manual mode. Verify
+that outputs remain safe, the state becomes RecoveryRequired, the reason is visible and resumption is
+impossible until the defined recovery procedure succeeds.
+Yael: And release evidence?
+Amir: Archive source revision, tool and compiler version, target firmware, libraries, configuration, test report,
+approved change request, checksum or signature where supported, and a tested restore package. A backup
+that has never been restored is only hope stored on a server.
+Yael: Online edits?
+
+Amir: They may be necessary during commissioning, but each one is a controlled change. Record it,
+reconcile it into the master source, rerun the affected tests and create a new release. The controller should
+never become the only place where the truth exists.
+44:00-46:00 | Corrected architecture and closing
+Yael: Let us resolve the skid. What changed?
+Amir: The physical pump output is now written only by PumpModule. Manual control, the automatic
+sequence and recovery logic send requests; they cannot write the output directly. The module resolves
+priority, proves the valve path, verifies level and drive readiness, applies the stop or trip conditions and
+exposes one reason when starting is blocked.
+Yael: The retained step number?
+Amir: Retained only as production evidence, not as an instruction to resume. After uncontrolled power loss,
+the unit enters RecoveryRequired. The recipe is reloaded and validated, live device state is rebuilt from
+feedback, and the operator follows an explicit recovery sequence. Automatic circulation cannot resume until
+the equipment state and process conditions are reconciled.
+Yael: The code was also split into I/O, device, equipment, sequence and supervisory layers, with enumerated
+states and typed interfaces.
+Amir: And the team added static-analysis rules for multiple writers, unit tests for PumpModule, sequence
+simulations for every abnormal exit and hardware tests for power recovery. The fix is not one extra normally
+closed contact. It is a software structure that makes ownership and state visible.
+Yael: Give us the final rules.
+Amir: Choose the language that makes the engineering intent easiest to review. Give every output one
+owner. Model modes and sequence states explicitly. Treat retained data and restart as separate design
+decisions. Keep module interfaces typed and small. Control libraries and releases. Test failures and
+recovery, not only the happy path.
+Yael: In Episode 8 we will use those interfaces to build the operator's window into the machine: HMI
+hierarchy, high-performance graphics, navigation, commands, alarms and the difference between a screen
+that looks impressive and one that supports a correct decision.
+Amir: Good control software knows what the machine is doing. A good HMI helps a human understand why.
