@@ -1,0 +1,358 @@
+## 00:00-03:00 | Cold open - the heat exchanger that would not stop heating
+
+[Low plant ambience. A valve actuator moves. A short alarm tone fades under the voices.]
+
+**Amir:** Imagine a liquid heat exchanger starting from cold. The outlet temperature setpoint is sixty degrees. The process is sitting at thirty-five. The controller sees a huge error and drives the steam valve to one hundred percent. Nothing seems to happen for twenty seconds because the hot fluid still has to travel through the exchanger and reach the temperature sensor.
+
+**Yael:** So the operator sees thirty-five, thirty-six, maybe thirty-seven, while the valve is already fully open.
+
+**Amir:** Exactly. And the integral term keeps asking for more output even though there is no more output available. Then the thermal wave reaches the sensor. Temperature rises quickly through fifty, sixty, sixty-five. The valve finally begins to close, but the controller has accumulated a large internal demand. The process overshoots to seventy-two.
+
+**Yael:** The common reaction is "the PID is too aggressive."
+
+**Amir:** Sometimes. But this incident may be telling us something more basic: the loop has dead time, the output saturated, the integrator was allowed to wind up, and perhaps the controller was not tracking the actual valve demand. Tuning is only one part of the story.
+
+[Theme music.]
+
+**Yael:** Welcome to Control Edge. We have spent nine episodes building the path from sensors and actuators through controllers, software, networks, HMI, SCADA and historians. Today we finally ask a deceptively simple question: once you have a good measurement, how do you make the process stay where you want it?
+
+**Amir:** And the answer starts with process dynamics, not with three numbers labeled P, I and D.
+
+## 03:00-07:00 | What a process loop actually controls
+
+**Yael:** Let us use the heat exchanger as our map. What are the four variables I should identify first?
+
+**Amir:** First, the **process variable**, PV: outlet temperature. Second, the **setpoint**, SP: the desired outlet temperature. Third, the **control variable** or **manipulated variable**, CV or MV: perhaps the steam-valve command. Fourth, disturbances: things that affect outlet temperature but are not directly commanded by this controller.
+
+**Yael:** Such as feed temperature and feed flow.
+
+**Amir:** Exactly. Also steam-header pressure, exchanger fouling, fluid properties, another upstream control loop, or a production-rate change. A feedback controller reacts after those disturbances influence the PV. That is both its power and its limitation.
+
+**Yael:** Because feedback does not need to know which disturbance occurred. It only needs to see the result.
+
+**Amir:** Correct. If the outlet gets too cold, the controller can add heat whether the cause was colder feed, higher flow or reduced heat-transfer coefficient. But it can act only after the measurement begins to reveal the deviation. Dead time matters because the process may continue moving while the controller is effectively blind to the result of its latest action.
+
+**Yael:** Mechanical engineers sometimes think of the valve command as the output and stop there.
+
+**Amir:** The physical output is not the percentage on the HMI. The physical output is heat transfer. A fifty-percent valve command may not mean fifty percent steam flow. Valve characteristic, pressure drop, positioner behavior and upstream pressure change the relationship. So the manipulated variable used in the control calculation and the actual physical influence are connected, but they are not necessarily identical.
+
+**Yael:** Which is why a loop can be mathematically correct and physically bad.
+
+**Amir:** Yes. If the actuator is sticky, oversized, slow or saturated, the controller is operating through a distorted interface to the process.
+
+## 07:00-13:00 | Process dynamics before controller tuning
+
+**Yael:** You said tuning starts with dynamics. What do you want to know before touching the gain?
+
+**Amir:** At minimum, I want a feel for process gain, response speed and delay. For many loops, a first-order-plus-dead-time approximation is extremely useful. It is not because every plant is first order. It is because three numbers often tell us enough to choose a sensible control strategy and starting tune.
+
+**Yael:** Start with process gain.
+
+**Amir:** Suppose we move the steam valve from forty to fifty percent and, after the process settles, the outlet temperature rises from fifty to fifty-five degrees. The process gain around that operating point is roughly the PV change divided by the input change. The sign matters too. If opening the valve raises temperature, the gain is positive. If increasing cooling-valve opening lowers temperature, the gain is negative.
+
+**Yael:** And that sign connects to direct or reverse controller action.
+
+**Amir:** Right. The controller must push the actuator in the direction that reduces error. Getting action direction wrong is not "bad tuning"; it is positive feedback, and it can drive the loop to a limit very quickly.
+
+**Yael:** Next is the time constant.
+
+**Amir:** Think of it as the dominant speed of the process after the response begins. A small vessel temperature may respond over seconds or minutes. A large thermal mass may take tens of minutes. Pressure can be fast. Composition measured by an analyzer can be very slow. The controller bandwidth must fit the physics.
+
+**Yael:** Then dead time is the part where nothing visible happens yet.
+
+**Amir:** More precisely, the measured output does not yet reveal the effect. Transport delay is a classic cause: material travels from where we act to where we measure. Sensor filtering, analyzer cycle time, network scheduling and actuator delay can all add effective dead time. Dead time is difficult because the controller is making new decisions using information about actions whose results have not yet arrived.
+
+**Yael:** So the ratio between dead time and process time constant tells us something about controllability.
+
+**Amir:** Yes. A process with little delay relative to its response can usually tolerate more aggressive feedback than one dominated by dead time. The more delay you have, the more you must value robustness and patience.
+
+**Yael:** What about a tank-level loop? If I open an outlet valve, the level may keep falling rather than settle at a new level.
+
+**Amir:** That is an **integrating process**. Level is the integral of net flow. There may be no natural self-regulating steady state for a fixed mismatch between inlet and outlet. Many inventory loops behave that way. It changes tuning logic: a level controller is often intentionally slower because its job may be to absorb flow disturbances rather than immediately force level back to setpoint.
+
+**Yael:** So a temperature loop and a level loop can both use PI control, but the tuning objective is different.
+
+**Amir:** Exactly. "Use PID" is not a control strategy. You must define what good behavior means for that process.
+
+**Yael:** Before we leave dynamics, how do you tell whether a trend is showing dead time or simply a slow sensor?
+
+**Amir:** By tracing the whole chain. If the valve position changes immediately but flow does not change, the actuator or hydraulic path may be slow. If flow changes quickly but the temperature sensor remains flat, the delay is downstream in the process or measurement location. If a second faster temperature measurement moves earlier, the installed transmitter or its filtering may be adding lag. "The process is slow" is a hypothesis, not a diagnosis.
+
+**Yael:** That matters because we could tune around a delay that should actually be removed.
+
+**Amir:** Exactly. Moving a sensor, reducing unnecessary filtering, fixing a sluggish valve or improving mixing can increase controllability more than any tuning trick. Control engineering should not compensate for avoidable physical defects if we can correct the defect.
+
+**Yael:** You also mentioned self-regulating and integrating processes. Is there another behavior worth recognizing early?
+
+**Amir:** Nonlinearity. Process gain and delay can change with operating point. A valve near its seat may have very different effective gain from the same valve at mid-stroke. Heat-transfer coefficients change with flow. Pump curves and system curves interact. If a loop is excellent at fifty percent production and unstable at ninety percent, do not assume somebody changed the tuning; the process may have changed underneath the same tuning.
+
+**Yael:** And occasionally a process moves first in the wrong direction.
+
+**Amir:** Yes, inverse response exists in some systems. That is beyond our main scope today, but it is a warning against tuning from one short trend without understanding the physics. If the initial response and final response tell different stories, stop and investigate before making the controller more aggressive.
+
+## 13:00-21:00 | P, I and D without mythology
+
+**Yael:** Let us finally open the three letters. Proportional first.
+
+**Amir:** Proportional action reacts to current error. The larger the error, the larger the corrective contribution. More proportional gain usually makes the controller react more strongly and reduces immediate deviation, but too much gain reduces robustness and can produce oscillation.
+
+**Yael:** So P is the fast reflex.
+
+**Amir:** That analogy is fine as long as we remember that the reflex acts through a delayed physical process. If you double the reaction while the plant is slow to show results, you can easily over-correct before you know what the previous correction did.
+
+**Yael:** Why can proportional-only control leave an offset?
+
+**Amir:** Because many self-regulating processes require a nonzero controller output to balance the load. With proportional-only control, a sustained error may be needed to produce that output difference. Integral action removes that steady-state error by accumulating error over time.
+
+**Yael:** Integral keeps adding correction while the error persists.
+
+**Amir:** Yes. That is why integral is powerful and dangerous. It guarantees persistence. If the PV is below setpoint for a long time, integral continues to push. In normal operation that removes offset. During saturation or a failed actuator, the same persistence can store a huge internal demand.
+
+**Yael:** Which is exactly our heat-exchanger startup.
+
+**Amir:** Right. The controller demanded more than one hundred percent steam. The physical valve could not comply, but the integrator could continue increasing internally unless anti-windup stopped or corrected it.
+
+**Yael:** Derivative is the least loved term in plants.
+
+**Amir:** Often for good reason. Derivative reacts to rate of change. It can add damping and anticipate a fast-moving PV, particularly on processes with meaningful lag. But measurement noise also has rapid changes, so derivative can amplify noise unless filtered appropriately.
+
+**Yael:** Why do many industrial controllers use derivative on PV rather than derivative on error?
+
+**Amir:** If derivative acts on the full error, an abrupt setpoint change creates a large derivative response - the so-called derivative kick. Applying derivative to PV avoids reacting to the setpoint step in that way. Industrial implementations also commonly filter the derivative term.
+
+**Yael:** Does every loop need all three terms?
+
+**Amir:** No. PI is probably the most common industrial structure. Flow and pressure loops often work very well with PI. Temperature can benefit from derivative in some cases, especially where there is appreciable lag and the measurement is clean. Level is often PI or even P-only depending on the inventory objective. The controller structure follows process dynamics and performance needs.
+
+**Yael:** And if the actuator has backlash or stiction, increasing integral gain can just make it cycle harder.
+
+**Amir:** Exactly. A sustained oscillation is not automatically a tuning problem. Valve stiction, sensor noise, limit cycles, interaction with another loop and cyclic disturbances can all look like "bad PID." Good troubleshooting separates controller behavior from process and final-element behavior.
+
+**Yael:** I want one more practical picture of P, I and D working together. Suppose the outlet temperature suddenly falls by five degrees because feed flow increases. What happens first?
+
+**Amir:** Proportional reacts immediately to the new error. Integral begins accumulating as long as the error remains. If derivative is used on PV, it reacts to how quickly the temperature is falling and can temporarily add corrective action or damping depending on the controller direction and form.
+
+**Yael:** If we raise proportional gain, the initial steam response gets stronger.
+
+**Amir:** Yes, but the price is sensitivity. A stronger loop can reject disturbances faster, yet it has less margin for extra dead time, higher process gain or interaction with another loop. Robust tuning means accepting that the process model is never exact.
+
+**Yael:** If we make integral faster, offset disappears faster.
+
+**Amir:** Usually, but again with a price. Too much integral action can make a delayed loop oscillatory and can work the valve unnecessarily. In many poorly performing loops the temptation is to increase integral because the PV is slow, when the real reason is a saturated valve or a disturbance the actuator cannot overcome.
+
+**Yael:** And derivative is not a cure for bad proportional and integral tuning.
+
+**Amir:** Correct. Derivative can improve damping, but if the measurement is noisy or the actuator is slow, D may simply generate busy output. A useful commissioning habit is to trend the individual P, I and D contributions when the platform exposes them. You can then see whether the integral is dominating, whether derivative is reacting to noise, or whether proportional is doing almost nothing.
+
+**Yael:** What about setpoint weighting? You mentioned that different objectives matter.
+
+**Amir:** Some industrial algorithms let proportional or derivative see a weighted setpoint rather than the full setpoint step. That can preserve strong disturbance rejection while making setpoint response gentler. It is a reminder that tuning gains and setpoint behavior are separable design choices in a mature implementation.
+
+## 21:00-26:00 | Industrial PID forms and implementation differences
+
+**Yael:** Here is where people get into trouble copying numbers between controllers.
+
+**Amir:** Yes. "PID" does not imply one universal numerical equation. ISA-TR5.9 documents multiple industrial forms and naming conventions, including parallel, standard and series forms. Vendors may also expose independent gains or dependent gains, different integral units, derivative options, setpoint weighting and different internal tracking behavior.
+
+**Yael:** Give me the practical consequence.
+
+**Amir:** A proportional gain of two, an integral time of one minute and a derivative time of ten seconds in one platform may not map numerically to another platform that expects integral gain in repeats per minute or uses a different equation form. Before migrating tuning constants, inspect the controller equation and units.
+
+**Yael:** Even controller action can be named differently.
+
+**Amir:** Correct. Some platforms define error as SP minus PV and then use a direction flag. Others define direct and reverse action differently. What matters physically is simple: if the PV is below target, does the output move in the direction that should raise the PV? Verify that with a small, controlled test.
+
+**Yael:** Update time also matters.
+
+**Amir:** Very much. A digital controller assumes a time base. The algorithm may use an explicit loop update time or be designed to execute in a periodic task. If the actual execution period is inconsistent with the configured time base, integral and derivative behavior can be wrong. Sampling too slowly can miss dynamics; sampling extremely fast can expose more noise without improving physical control.
+
+**Yael:** So before tuning, I need to know the actual implementation.
+
+**Amir:** Yes: equation form, gain units, update time, scaling, output limits, derivative filter, manual tracking and anti-windup behavior. That is the difference between tuning the process and tuning a mystery box.
+
+**Yael:** We should also talk about controller output versus actual valve position. Suppose the PID output falls to thirty percent, but a sticky valve remains at sixty percent for several seconds.
+
+**Amir:** That is exactly why downstream feedback can matter. If the controller assumes its command is being realized, integral action may continue based on a false picture of the manipulated variable. An external-reset or tracking scheme can use actual selected output or position feedback, depending on architecture, to keep the controller state aligned with what the process is really receiving.
+
+**Yael:** Is that also useful in override control, where several controllers compete for one valve?
+
+**Amir:** Yes. Imagine pressure, temperature and flow controllers feeding a high-select or low-select block. Only one output wins. The controllers that lose selection must not quietly wind up while disconnected from the actuator. Tracking the selected output helps them remain ready to take over without a huge bump. We are not teaching override design today, but it shows why internal state management matters.
+
+**Yael:** So a PID block should know when it does not own the actuator.
+
+**Amir:** Either the block itself or the surrounding control architecture must know. Ownership is a first-class design concept. Manual stations, interlocks, startup sequences, overrides and safety actions can all temporarily replace the nominal PID demand. Every transfer needs defined tracking behavior.
+
+**Yael:** What would you test during FAT for this?
+
+**Amir:** Simulate a saturated output, hold it there, then remove the constraint and watch recovery. Switch Manual to Auto at several output values. Force the cascade secondary loop unavailable and recover it. Simulate a bad PV. Restart the controller. These tests often reveal more serious problems than a perfectly tuned nominal step response.
+
+## 26:00-32:00 | Saturation, windup and mode transfer
+
+**Yael:** Back to the valve at one hundred percent. What exactly is integral windup?
+
+**Amir:** It is the controller's integral state continuing to accumulate a demand that the actuator cannot deliver because the output is constrained. The controller's internal state becomes disconnected from the real manipulated variable. When the process finally catches up, the integrator has to unwind before the output can return to the range needed for control.
+
+**Yael:** What are the common anti-windup strategies?
+
+**Amir:** One simple method is conditional integration: stop integrating farther into the limit. Another is back-calculation: use the difference between requested output and actual limited or tracked output to drive the integrator back toward a realizable state. External-reset feedback is a broader industrial concept that can make integral action track the actual downstream response or selected output.
+
+**Yael:** So anti-windup is not just "clamp the final output at one hundred percent."
+
+**Amir:** Exactly. Output clamping protects the command range. Anti-windup manages the internal controller state while clamped.
+
+**Yael:** Now the operator takes the loop to manual at forty percent, stabilizes the exchanger, and switches back to auto. Why can the valve jump?
+
+**Amir:** If the automatic controller's internal state does not match the manual output, the first automatic calculation can demand a very different value. **Bumpless transfer** means the controller tracks or initializes its internal terms so the transition does not create an unnecessary step in output.
+
+**Yael:** Rockwell's documentation, for example, explicitly describes back-calculating integral or bias terms for bumpless manual-to-auto transfer.
+
+**Amir:** Yes, and that is a useful vendor-specific example of a general principle. The exact mechanism varies by platform. The engineering requirement should be expressed as behavior: when ownership or mode changes, the output should transition as intended and without an unexpected bump.
+
+**Yael:** What about cascade transfer?
+
+**Amir:** Same philosophy. If an outer controller hands a setpoint to an inner controller, both loops need tracking and initialization logic so a mode change does not suddenly drive the process. Good control systems treat mode transfer as a designed state transition, not as a side effect of the PID block.
+
+**Yael:** And safety limits?
+
+**Amir:** Important distinction: ordinary controller output limits, interlocks and regulatory constraints are not automatically independent safety functions. A safety instrumented function requires its own lifecycle and integrity basis where applicable. Never assume a PID high limit is equivalent to a safety trip.
+
+**Yael:** Before methods, how do you know a step test is usable?
+
+**Amir:** The input move must be large enough that the response rises above normal noise and disturbances, but small enough to remain within a reasonably linear and safe region. Hold other important conditions as steady as practical. Record the actual manipulated variable, not only the command, because a valve may not move exactly as requested. Continue the test long enough to observe the dominant response.
+
+**Yael:** And if production will not allow an open-loop test?
+
+**Amir:** Then use closed-loop identification, historical data, vendor autotuning, a commissioning window, or a process model. The method changes, but the need for identifiable dynamics does not. Never destabilize a critical process simply to obtain prettier model parameters.
+
+**Yael:** Let us compare tuning philosophies more directly.
+
+**Amir:** Ziegler-Nichols asks, in effect, for observed process characteristics and then maps them to controller settings designed for a characteristic response. IMC-style tuning starts from a process model and introduces a desired closed-loop time scale. Choosing a slower target generally improves robustness and reduces control effort; choosing a faster one pushes the loop harder.
+
+**Yael:** That sounds more transparent to a process engineer.
+
+**Amir:** It often is, because the tuning parameter has a physical interpretation. Skogestad's SIMC rules became popular partly because they reduce many common process models to simple forms and give compact PI/PID settings. But the engineer still decides the desired robustness and checks constraints.
+
+**Yael:** What about optimizing IAE or ISE directly?
+
+**Amir:** Those are useful metrics, but optimizing one number can produce undesirable actuator behavior. A tune that minimizes error aggressively may increase valve travel, noise sensitivity or overshoot. In production, the objective function is usually multi-dimensional even if the software reports one score.
+
+**Yael:** So if autotune says "excellent," we still validate.
+
+**Amir:** Always. The autotuner saw a particular test, at a particular operating point, with particular disturbances. Commissioning asks whether the result is acceptable for the plant's real operating envelope.
+
+## 32:00-37:00 | How to tune a loop
+
+**Yael:** Here is the question everyone asks: what values do I enter?
+
+**Amir:** First define the objective. Do you care most about rejecting load disturbances? Tracking setpoint changes quickly? Minimizing overshoot? Reducing valve movement? Remaining robust when the process gain doubles? There is no single tuning that optimizes every objective.
+
+**Yael:** Then we need a process test.
+
+**Amir:** Often, yes. A controlled open-loop or manual step test can reveal process gain, time constant and dead time. You make a safe change in output, trend the manipulated variable and PV, wait long enough to see the response, and fit a simple model. But the test must respect operating constraints and process risk.
+
+**Yael:** Historically, Ziegler and Nichols gave field rules based on process reaction or ultimate cycling.
+
+**Amir:** Their 1942 work was hugely influential because it gave engineers a practical way to obtain controller settings from observed dynamics. But the classic settings can be aggressive for many modern process objectives. They are a historical foundation, not a universal commissioning recipe.
+
+**Yael:** What is the alternative you would teach a new engineer today?
+
+**Amir:** Model-based tuning such as IMC-derived rules or Skogestad's SIMC rules is often easier to reason about. You identify a simple process model and choose a desired closed-loop response or tuning parameter that trades speed against robustness. The value is not that SIMC is magically perfect; it makes the engineering compromise explicit.
+
+**Yael:** And autotuning?
+
+**Amir:** Useful when applied intelligently. Relay-feedback autotuning, derived from work by Astrom and Hagglund, deliberately excites the loop to identify useful frequency-response information. Modern vendor autotuners may use different identification methods. The engineer still has to verify that the excitation is safe, that the process was in an appropriate operating region and that the resulting performance meets the real objective.
+
+**Yael:** So tuning is identification plus objective plus validation.
+
+**Amir:** Exactly. And remember nonlinearity. A valve may have different gain at ten percent and eighty percent opening. A heat exchanger changes dynamics with production rate. One fixed tune may be adequate across the range, or you may need gain scheduling, adaptive strategies or a different architecture.
+
+**Yael:** Let us trace the cascade response in sequence. Feed flow rises. What happens first?
+
+**Amir:** If the disturbance also changes steam demand, the outlet temperature has not moved yet. The outer temperature loop therefore has no new feedback error. But if steam-header pressure changes, the inner steam-flow loop sees its own PV deviate almost immediately and corrects valve position. That shields the temperature loop from a disturbance it would otherwise see later.
+
+**Yael:** And if cold-feed flow itself is measured, feedforward can react before temperature changes.
+
+**Amir:** Correct. A simple feedforward might scale steam demand with feed flow; a better one may also account for inlet temperature or heat capacity. But model error is inevitable, which is why feedback remains present.
+
+**Yael:** Could feedforward itself hit limits and create windup?
+
+**Amir:** Yes. The combined demand still meets physical constraints. If feedforward drives the actuator near a limit, the feedback integrator must understand the available authority. Good implementations coordinate feedforward, feedback, constraints and tracking rather than simply adding numbers and hoping the sum behaves.
+
+**Yael:** That is a recurring theme: the controller equation is the easy part.
+
+**Amir:** Exactly. The engineering lives in the interfaces, constraints and transitions.
+
+## 37:00-41:00 | Cascade and feedforward
+
+**Yael:** Our heat exchanger still has another problem. Steam-header pressure changes, so the same valve position gives different steam flow.
+
+**Amir:** That is a strong case for cascade. Instead of the temperature controller directly commanding valve position, make the temperature controller the outer loop. Its output becomes the steam-flow setpoint. A faster inner flow loop manipulates the valve.
+
+**Yael:** The inner loop rejects steam-pressure disturbances before the outlet temperature has time to move.
+
+**Amir:** Exactly. Cascade works when the secondary measurement sees a disturbance earlier and the inner loop is meaningfully faster than the outer loop. If the inner loop is slow, noisy or badly tuned, cascade can make things worse.
+
+**Yael:** How much faster?
+
+**Amir:** Engineers often use "several times faster" as a practical heuristic, but do not turn that into a universal rule. Look at actual closed-loop dynamics and interaction. The inner loop must settle fast enough that the outer loop can reasonably treat it as an actuator.
+
+**Yael:** Now suppose we can measure incoming cold-feed flow. We know a flow increase will demand more steam even before outlet temperature falls.
+
+**Amir:** That enables **feedforward**. We estimate the corrective steam demand from the measured disturbance and add it to the feedback controller output or setpoint. Feedback cleans up model error and unmeasured disturbances; feedforward acts before the PV deviates significantly.
+
+**Yael:** So feedback is reactive but robust to unknown disturbances, while feedforward is proactive but depends on a useful disturbance measurement and model.
+
+**Amir:** Exactly. The best industrial design often combines both.
+
+**Yael:** Ratio control fits into the same family?
+
+**Amir:** Yes. Ratio control maintains a relationship between flows or quantities. It can be implemented as a form of feedforward or cascade structure. But every extra layer needs clear mode logic, tracking, limits and failure behavior.
+
+**Yael:** What trend patterns should make an engineer suspicious?
+
+**Amir:** A near-sinusoidal oscillation with constant period can indicate an overly aggressive loop, but also a limit cycle. A sawtooth output with PV movement only after large output changes can suggest stiction. A noisy output while PV barely moves can mean the controller is chasing measurement noise. Long periods at zero or one hundred percent tell you the actuator is saturated and tuning may not be the main limitation.
+
+**Yael:** And if two loops oscillate together?
+
+**Amir:** Look for interaction. One loop may be moving a shared utility or pressure that changes the gain of another loop. Independent PID tuning assumes, to some degree, that each loop has a reasonably defined input-output relationship. Strong multivariable interaction may require coordination, decoupling or advanced control rather than simply retuning both loops faster.
+
+**Yael:** This is also where the Historian from Episode 9 becomes useful.
+
+**Amir:** Exactly. A good historian lets you compare behavior across shifts, products and operating rates. But remember data quality, timestamps and mode context. A week of PV data without controller mode and output can lead to the wrong diagnosis.
+
+## 41:00-45:00 | Performance, commissioning and closing
+
+**Yael:** How do we know the loop is good after tuning?
+
+**Amir:** Do not judge only from one pretty setpoint step. Challenge the loop with realistic disturbances. Look at overshoot, settling, error integral, actuator travel and whether the valve is constantly reversing. Check performance at more than one operating point. Verify manual-to-auto and cascade transitions. Verify what happens when PV quality goes bad or communication is lost.
+
+**Yael:** And trend the right things.
+
+**Amir:** Always. At minimum trend SP, PV, controller output, actual final-element feedback if available, controller mode and relevant disturbance variables. A trend that shows only PV can hide the entire cause.
+
+**Yael:** Give us a commissioning checklist.
+
+**Amir:** Ten questions.
+
+1. Is the measurement scaled correctly, physically located correctly and dynamically fast enough?
+2. Does increasing the manipulated output move the PV in the expected direction?
+3. Is controller action - direct or reverse - verified with a controlled test?
+4. Are loop execution time and configured update time correct?
+5. Are output limits, rate limits and setpoint limits appropriate?
+6. Does anti-windup work when the output saturates?
+7. Are manual-to-auto and cascade transitions bumpless or otherwise intentionally designed?
+8. Was the process identified over a representative operating region?
+9. Was tuning validated against both setpoint and disturbance scenarios, including actuator movement?
+10. Are regulatory control, interlocks and independent safety functions clearly separated and documented?
+
+**Yael:** My summary is that a PID loop is not three gains. It is a physical process model, a digital implementation, an actuator with limits, a set of mode transitions and a performance objective.
+
+**Amir:** Exactly. And that is why a loop can have mathematically reasonable gains and still fail in production.
+
+**Yael:** Which leads directly to the next episode. Once we have control logic and tuning, how do we prove the software behaves correctly through startup, shutdown, faults, restarts and future changes?
+
+**Amir:** Episode 11 is about software quality, simulation and validation: code review, test architecture, simulation, FAT, regression testing and the discipline required to change a control system without rediscovering old failures.
+
+**Yael:** Until then, do not tune the controller before you understand what the process does after you move the actuator.
+
+**Amir:** And never confuse a smooth trend with a well-engineered loop. Thanks for listening to Control Edge.
