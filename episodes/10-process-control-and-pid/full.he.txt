@@ -1,0 +1,44 @@
+CONTROL EDGE - פרק 10
+בקרת תהליך ו-PID - דינמיקה, כוונון והתנהגות אמיתית של חוג בקרה
+משך יעד: 42-45 דקות
+קהל יעד: מהנדסי מכונות, תהליך, ייצור, מכשור ואוטומציה
+פורמט: דו-שיח בין יעל, מהנדסת מכונות צעירה, לבין אמיר, מהנדס תהליך ובקרה ותיק
+
+מקרה מרכזי
+חוג טמפרטורה במחליף חום עושה Overshoot לאחר ששסתום הקיטור מגיע ל-100%, ה-Integrator צובר בזמן Dead Time, ולאחר מכן החוג מתנהג לא נכון במעבר Manual-to-Auto.
+
+מטרת הפרק
+להסביר דינמיקת תהליך לפני PID Tuning; להבחין בין תגובת Setpoint לבין Disturbance Rejection; להפריד בין P/I/D לבין צורות PID תעשייתיות; ולהראות ש-Output Limits, Anti-Windup, Tracking ו-Bumpless Transfer הם חלק מהתכן ולא קישוט. הפרק מציג Cascade ו-Feedforward כהרחבות מעשיות ושומר גבול ברור בין Regulatory Control לבין פונקציות Safety עצמאיות.
+
+מטרות למידה
+1. לזהות PV, SP, CV/MV ו-Disturbances.
+2. להסביר Process Gain, Time Constant ו-Dead Time.
+3. להבחין בין Self-Regulating, Integrating והתנהגות לא-ליניארית.
+4. להסביר P, I ו-D ומדוע Derivative מופעל לעיתים על PV.
+5. להבין הבדלים בין Parallel, Standard ו-Series PID.
+6. להסביר Saturation, Windup, Anti-Windup ו-Bumpless Transfer.
+7. להבין Cascade ו-Feedforward.
+8. להשוות בין Ziegler-Nichols, IMC/SIMC ו-Autotuning כגישות עם Trade-Offs.
+9. לשפוט ביצועים לפי Disturbance Rejection, Setpoint Response, Overshoot, Settling, Error, Actuator Travel, Noise ו-Robustness.
+10. לבצע Commissioning של חוג PID בעזרת Checklist מסודר.
+
+חלוקת זמן
+00:00-03:00 פתיחה; 03:00-07:00 משתני החוג; 07:00-13:00 דינמיקת תהליך; 13:00-21:00 P/I/D; 21:00-26:00 צורות PID תעשייתיות; 26:00-32:00 Saturation ומעברי Mode; 32:00-37:00 Tuning; 37:00-41:00 Cascade ו-Feedforward; 41:00-45:00 ביצועים ו-Commissioning.
+
+מפת התהליך
+Process -> Sensor -> PV -> Controller -> CV/MV -> Final Control Element -> Process.
+Disturbances יכולים לכלול Feed Flow, Feed Temperature, Utility Pressure, Fouling, תכונות מוצר ופעולות מפעיל.
+
+מודל מעשי
+Process Gain K מתאר שינוי PV במצב יציב עבור שינוי קבוע בקלט באזור עבודה. Time Constant tau מתאר את מהירות התגובה לאחר שהיא מתחילה. Dead Time theta מתאר את ההשהיה עד שהשפעת הפעולה נראית במדידה. זהו קירוב הנדסי ולא טענה שהתהליך האמיתי הוא מסדר ראשון.
+
+מפת היישום
+PID תעשייתי כולל Direction of Action, Update Time, Scaling, Setpoint/Output Limits, Derivative Filtering, Anti-Windup, Manual/Auto ו-Cascade Tracking, Bad-PV Handling, Initialization ו-Restart Behavior.
+
+קובצי מקור קנוניים
+תסריט: script.he.txt
+הנחיית NotebookLM: notebooklm_prompt.he.txt
+תקנים ומקורות: standards_and_sources.he.md
+מסמך עריכה: full.he.md
+
+התסריט הוא חלק ממקור האמת של פרק 10 ויש לבצע Review שלו יחד עם מסמך הפרק ומפת המקורות.
