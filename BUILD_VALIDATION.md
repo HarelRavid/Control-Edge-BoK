@@ -36,3 +36,9 @@
 - he: full=4586 words, script=2956 words, notebooklm_prompt=216 words
 - en: full=5510 words, script=3676 words, notebooklm_prompt=262 words
 
+## Episode 10
+- he: modular source dossier + canonical script=3888 words, notebooklm_prompt=284 words
+- en: modular source dossier + canonical script=4962 words, notebooklm_prompt=327 words
+- PDF QA: Hebrew 14 pages; English 15 pages; both rendered and visually checked.
+
+> Episode 10 adopts the repository's text-first modular workflow: `full.*.md` is the engineering dossier and `script.*.txt` is the canonical spoken script. Review both together.
