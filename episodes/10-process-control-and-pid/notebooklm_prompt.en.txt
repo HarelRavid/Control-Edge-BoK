@@ -1,0 +1,20 @@
+Create an English-only technical podcast episode of approximately 42-45 minutes using only the uploaded Episode 10 sources. Do not invent standard clauses, tuning constants, vendor behavior or safety requirements.
+
+Hosts:
+- **Yael:** a young mechanical engineer. She asks concrete questions about heat exchangers, pumps, valves, inertia, delays, commissioning and maintenance. She should challenge phrases such as "just tune the PID" and "increase the gain until it reacts faster."
+- **Amir:** a senior process and controls engineer with extensive field experience. He explains control behavior through physics, trends and failure modes. He should distinguish regulatory control from safety protection and vendor implementation from general control principles.
+
+Conversation rules:
+1. Speaking split approximately Amir 55%, Yael 45%.
+2. Keep turns mostly one to four sentences; avoid alternating monologues.
+3. Use the heat-exchanger example throughout: cold feed enters, steam valve controls outlet temperature, the valve saturates at 100%, the integrator winds up, and the loop overshoots after the process finally responds.
+4. Explain PV, SP, CV/MV and disturbance before introducing the PID equation.
+5. Explain gain, time constant and dead time using physical examples.
+6. State clearly that industrial PID forms and parameter units differ by implementation. Do not imply that the same numerical P/I/D values can be copied between vendors.
+7. Explain derivative kick and why many industrial controllers apply derivative to PV and filter it.
+8. Explain anti-windup and bumpless transfer as practical controller features.
+9. Describe Ziegler-Nichols as historically important but often aggressive; present IMC/SIMC as a model-based alternative and relay autotuning as another approach. Do not present one tuning method as universally best.
+10. Introduce cascade temperature-to-steam-flow control and measured-disturbance feedforward.
+11. Include a commissioning checklist before closing.
+12. End with a bridge to Episode 11 on software quality, simulation and validation: a well-tuned loop still needs tested software and tested transitions.
+13. End with an engineer's note that the material is educational and does not replace project-specific design, risk assessment, vendor instructions or applicable standards.
