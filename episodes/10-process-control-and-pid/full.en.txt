@@ -1,0 +1,44 @@
+CONTROL EDGE - EPISODE 10
+Process Control and PID - Dynamics, Tuning and Real-World Loop Behavior
+Target duration: 42-45 minutes
+Audience: mechanical, process, manufacturing, instrumentation and automation engineers
+Format: dialogue between Yael, a young mechanical engineer, and Amir, a senior process and controls engineer
+
+CORE EXAMPLE
+A heat-exchanger temperature loop overshoots after the steam valve saturates at 100%, the integrator winds up during process dead time, and the loop later behaves badly during a manual-to-auto transfer.
+
+EPISODE PURPOSE
+Explain process dynamics before PID tuning. Distinguish setpoint response from disturbance rejection, P/I/D action from industrial PID forms, and tuning constants from implementation features such as output limits, anti-windup, tracking and bumpless transfer. Introduce cascade and feedforward as practical extensions while keeping ordinary regulatory control separate from independent safety functions.
+
+LEARNING OBJECTIVES
+1. Identify PV, SP, CV/MV and disturbances.
+2. Explain process gain, time constant and dead time.
+3. Distinguish self-regulating, integrating and nonlinear processes.
+4. Explain proportional, integral and derivative action and derivative-on-PV behavior.
+5. Recognize parallel, standard and series PID implementation differences.
+6. Explain saturation, windup, anti-windup and bumpless transfer.
+7. Understand cascade and feedforward.
+8. Compare Ziegler-Nichols, IMC/SIMC and autotuning as approaches with trade-offs.
+9. Judge performance using disturbance rejection, setpoint behavior, overshoot, settling, error, actuator travel, noise and robustness.
+10. Commission a PID loop using a structured checklist.
+
+TIMING
+00:00-03:00 cold open; 03:00-07:00 loop variables; 07:00-13:00 process dynamics; 13:00-21:00 P/I/D; 21:00-26:00 industrial PID forms; 26:00-32:00 saturation and mode transfer; 32:00-37:00 tuning; 37:00-41:00 cascade and feedforward; 41:00-45:00 performance and commissioning.
+
+PROCESS MAP
+Process -> Sensor -> PV -> Controller -> CV/MV -> Final Control Element -> Process.
+Disturbances can include feed flow, feed temperature, utility pressure, fouling, product properties and operator actions.
+
+PRACTICAL MODEL
+Process gain K describes steady-state PV change per sustained input change near an operating point. Time constant tau describes characteristic response speed after the response begins. Dead time theta describes the delay before the effect of an action becomes visible in the measurement. This is an engineering approximation, not a claim that the real plant is mathematically first order.
+
+IMPLEMENTATION MAP
+A production PID includes direction of action, update time, scaling, setpoint/output limits, derivative filtering, anti-windup, manual/auto and cascade tracking, bad-PV handling, initialization and restart behavior.
+
+CANONICAL PRODUCTION FILES
+Spoken script: script.en.txt
+NotebookLM instruction: notebooklm_prompt.en.txt
+Standards and sources: standards_and_sources.en.md
+Editable dossier: full.en.md
+
+The spoken script is part of the Episode 10 source of truth and must be reviewed together with the dossier and source map.
