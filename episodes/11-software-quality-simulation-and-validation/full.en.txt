@@ -1,0 +1,99 @@
+CONTROL EDGE - EPISODE 11
+Software Quality, Simulation and Validation
+Proving Industrial Control Software Before It Reaches the Plant
+
+Audience: Mechanical, process, manufacturing and automation engineers
+Target duration: 42-46 minutes
+Status: Complete
+
+PURPOSE
+This episode explains how engineers prove that industrial control software behaves correctly before and after deployment. The focus is not software style; it is the evidence chain from requirement to implementation, test, acceptance, release and future change.
+
+CORE CASE
+A transfer skid has passed normal FAT. During commissioning, communication to the outlet-valve remote I/O is lost for three seconds. The valve feedback becomes bad, the sequence faults and the pump stops. Communication recovers. The operator presses Reset and Start. Because the transfer state was retained, the pump command returns before the outlet valve is fully open. The normal sequence worked, but a fault-recovery transition was never tested.
+
+MAIN ENGINEERING QUESTIONS
+1. What does software quality mean in an industrial control system?
+2. How do verification, validation and acceptance differ in practical engineering use?
+3. How do we write requirements that produce an observable pass/fail result?
+4. How do we trace requirements to code and test evidence?
+5. Which defects can be found by design review, code review and static analysis before execution?
+6. What is the purpose of unit, integration, system and acceptance testing?
+7. How should boundary values, state transitions, communication faults, bad data quality, restart and retained data be tested?
+8. What is a test oracle and why is 'it looked okay' insufficient?
+9. Why do code-coverage percentages not prove correctness by themselves?
+10. How do software-in-the-loop, hardware-in-the-loop and virtual commissioning differ?
+11. How accurate does a simulation model need to be for a given engineering question?
+12. What should FAT, optional FIT, SAT and SIT each prove?
+13. How are failed tests, defects and deviations controlled?
+14. How do impact analysis, regression testing, baselines and rollback make future changes safer?
+15. Where does normal control testing end and functional-safety validation begin?
+
+QUALITY-EVIDENCE CHAIN
+Need -> user and operating requirements.
+System behavior -> functional requirements, sequences and cause-and-effect.
+Architecture -> modules, interfaces and ownership.
+Implementation -> PLC/DCS/HMI code, review and static analysis.
+Integration -> interacting software and devices, SIL/HIL tests.
+System -> complete application under normal and abnormal scenarios.
+Acceptance -> FAT/FIT/SAT/SIT evidence against agreed criteria.
+Operation/change -> versioned baseline, impact analysis, regression and rollback.
+
+TEST DESIGN FAMILIES
+Nominal: normal transfer with all permissives healthy.
+Boundary: values exactly at or near limits.
+State transition: stop/reset while an actuator is moving or a sequence is between states.
+Fault injection: bad quality, communication dropout, missing feedback, drive not ready.
+Persistence: power cycle or warm restart during an active sequence.
+Concurrency: two functions request the same shared resource.
+Timing: feedback arrives near timeout or the response occurs near a deadline.
+Operator action: manual commands during automatic faults or mode transitions.
+Regression: rerun previously passed scenarios after software changes.
+
+SIMULATION LADDER
+Manual forcing/signal injection: useful for commissioning, but not a dynamic plant model.
+Unit-test harness: exercises a small software block with known inputs and expected outputs.
+Software-in-the-loop: controller application executes against a software model.
+Hardware-in-the-loop: real controller hardware executes against a simulated plant.
+Virtual commissioning: automation is exercised against a machine/process model before the real equipment is fully available.
+Digital twin: a broader architecture term; not every virtual-commissioning model should be called a digital twin.
+
+MODEL-FIDELITY RULE
+The model must be accurate for the question it is being used to answer. A boolean sequence test may need realistic sensor/actuator states and timing but not detailed thermodynamics. A controller-tuning exercise may require process gain, dead time, time constants, nonlinearities and actuator limits. The simulation model itself must be checked against reality where its fidelity matters.
+
+ACCEPTANCE TEST LAYERS
+FAT: demonstrate as much of the automation specification as practical before site deployment, including normal behavior, failures, recovery, alarms, HMI, communications, backups and software versions.
+FIT: optional factory integration layer when multiple packages or vendors must prove interfaces before site.
+SAT: verify installed reality: wiring, instruments, ranges, actuator direction, motor rotation, network paths, time synchronization, permissions and site-specific behavior.
+SIT: verify integrated site interfaces among packages, plant systems, utilities and external systems. Project terminology can vary.
+
+RELEASE AND CHANGE CONTROL
+Every release should answer: What changed? Who reviewed it? Which tests passed? Which known issues remain? What software/firmware/configuration versions are included? Which artifact is running? Is there a usable backup? What is the rollback plan?
+
+Regression scope should be risk-based. A change to a common valve function block requires broader regression than a change to one HMI label.
+
+SAFETY BOUNDARY
+General PLC/DCS testing is not a substitute for the verification and validation evidence required for safety-related functions. Safety software must follow the applicable safety lifecycle, such as IEC 61508, ISO 13849 or IEC 62061 where applicable. Episode 13 covers functional safety in depth.
+
+12-QUESTION RELEASE CHECKLIST
+1. Are requirements observable and testable?
+2. Is each important requirement traceable to code and test evidence?
+3. Have restart, retained data and mode transitions been tested?
+4. Have negative and recovery paths been tested?
+5. Has an independent engineer reviewed architecture and code?
+6. Are test environment and software versions recorded?
+7. Is simulation-model fidelity documented and validated where required?
+8. Are unit, integration, system and acceptance tests separated by purpose?
+9. Did FAT include failures and recovery, not only normal operation?
+10. Did SAT/SIT re-verify installed wiring, actuators, networks and interfaces?
+11. Does every change have impact analysis, regression evidence and rollback capability?
+12. Are safety-related functions handled under their applicable safety lifecycle?
+
+CANONICAL PRODUCTION FILES
+Full spoken dialogue: script.en.txt
+NotebookLM production instruction: notebooklm_prompt.en.txt
+Standards and sources: standards_and_sources.en.md
+Editable engineering dossier: full.en.md
+
+NEXT EPISODE
+Episode 12: Industrial Cybersecurity - zones and conduits, identities, remote access, secure development, patching, backups, incident response and the IEC 62443 lifecycle.
