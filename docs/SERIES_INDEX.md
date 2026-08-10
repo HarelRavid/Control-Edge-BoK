@@ -12,10 +12,10 @@
 | 08 | [HMI and Operator Interface Design](../episodes/08-hmi-and-operator-interface-design/README.md) | HMI ותכנון ממשק מפעיל | 40-45 minutes | Complete |
 | 09 | [SCADA, DCS, Historians and Plant Data Infrastructure](../episodes/09-scada-dcs-historian-and-plant-data/README.md) | SCADA, DCS, Historian ותשתית הנתונים המפעלית | 40-45 minutes | Complete |
 | 10 | [Process Control and PID - Dynamics, Tuning and Real-World Loop Behavior](../episodes/10-process-control-and-pid/README.md) | בקרת תהליך ו-PID - דינמיקה, כוונון והתנהגות אמיתית של חוג בקרה | 42-45 minutes | Complete |
+| 11 | [Software Quality, Simulation and Validation - Proving Industrial Control Software Before It Reaches the Plant](../episodes/11-software-quality-simulation-and-validation/README.md) | איכות תוכנה, סימולציה ו-Validation - איך מוכיחים שתוכנת בקרה באמת מוכנה למפעל | 42-46 minutes | Complete |
 
 ## Planned continuation
 
-11. Software quality, simulation and validation
 12. Industrial cybersecurity
 13. Functional safety and machine regulation
 14. Predictive maintenance and condition monitoring
