@@ -1,0 +1,270 @@
+## 00:00-03:00 | Cold open - the reset nobody tested
+
+[Low plant ambience. A pump starts, a valve actuator moves, then an alarm tone.]
+
+**Amir:** Imagine a transfer skid that has already passed FAT. The normal sequence has been run dozens of times. Tank A has product, the route to Tank B is aligned, the transfer pump starts, and the flow controller settles exactly where it should. Then, during commissioning, the network cable to the outlet-valve remote I/O is disconnected for three seconds.
+
+**Yael:** The valve feedback goes bad, the sequence faults, and the pump stops. So far, that sounds correct.
+
+**Amir:** Correct. Maintenance reconnects the cable. The feedback becomes healthy again. The operator presses Reset and then Start. The software resumes at the retained transfer step, the pump command returns immediately, but the outlet valve is still travelling open. For two seconds the pump is pushing against a nearly closed path.
+
+**Yael:** So every line of code may have looked reasonable, the normal sequence worked, and still the system had a dangerous behavior hidden in one combination of fault, recovery and retained state.
+
+**Amir:** Exactly. The defect was not in the happy path. It lived in the transition between abnormal states. That is why industrial software quality is not the same as "the PLC runs" or "we tested it during FAT." Quality means we can explain what the software shall do, prove that each important behavior has been checked, reproduce the result, and change the software later without reopening old failures.
+
+**Yael:** Then today is really about evidence.
+
+**Amir:** Evidence and discipline. We will talk about requirements, verification, validation, reviews, unit tests, simulation, hardware-in-the-loop, virtual commissioning, FAT, SAT, regression testing and release control. And we will keep asking one question: what failure could still be hiding between the tests we chose to run?
+
+[Theme sting.]
+
+## 03:00-07:00 | What software quality means in an industrial system
+
+**Yael:** When software engineers say "quality," they may mean code style, test coverage or defects per release. What does quality mean to a controls engineer?
+
+**Amir:** It begins with correct behavior, but that is only the first layer. Industrial control software also needs predictable timing, diagnosability, recoverability, maintainability, testability and controlled change. A machine that works only when the original programmer is standing beside it is not high-quality software.
+
+**Yael:** And a beautifully structured program that commands the wrong valve is still wrong.
+
+**Amir:** Exactly. We should separate three ideas. First, **verification**: did we implement the specified behavior correctly? Second, **validation**: does the integrated system satisfy the intended operational need in its real context? Third, **acceptance**: have the parties agreed that the demonstrated system meets the contractual criteria for handover?
+
+**Yael:** Those words are used differently in different standards and companies.
+
+**Amir:** Yes. Never fight over vocabulary without checking the applicable standard and project definitions. But the engineering distinction is useful: a function block can be verified against its requirements, while the final machine still needs validation as part of the real mechanical and process system.
+
+**Yael:** So software quality is not created at the end by testing.
+
+**Amir:** Right. Testing reveals information. It cannot rescue ambiguous requirements, undocumented interfaces or architecture that allows five different routines to write the same command. Quality is designed into the lifecycle: requirements, architecture, implementation, review, test, integration, release, commissioning, operation and change.
+
+**Yael:** This connects to Episode 7, where we talked about one software owner for each physical output.
+
+**Amir:** Exactly. Architecture creates testable boundaries. If a Pump module owns the pump command, a Sequence module requests operation, and an Interlock layer can inhibit operation, then we can test each responsibility. If every routine writes directly to the motor output, the state space becomes much harder to understand.
+
+## 07:00-12:00 | Requirements must be testable contracts
+
+**Yael:** Let us go back to our transfer skid. What requirement would have prevented the reset failure?
+
+**Amir:** Several. A weak requirement says, "The pump shall start when the operator presses Start." A stronger requirement says, "The transfer pump may start only when the commanded route is proven open, all required instrument qualities are acceptable, the drive is ready, and the sequence is in a defined startable state." Then we add recovery behavior: "After loss and restoration of valve feedback, automatic transfer shall not resume until route permissives have been re-evaluated and proven."
+
+**Yael:** That is already a test case waiting to happen.
+
+**Amir:** Exactly. A useful requirement is observable. It defines the trigger, conditions, expected behavior, timing where relevant, and failure response. For sequences, state diagrams and transition tables are often more testable than prose alone. For interlocks, a cause-and-effect matrix can map each cause to each commanded action. For analog loops, we need ranges, quality handling, limits and mode behavior.
+
+**Yael:** Where do requirement IDs help?
+
+**Amir:** Traceability. Give important requirements stable identifiers. Then a test can say: Test T-042 verifies REQ-TR-017 and REQ-TR-021. If a requirement changes, we can find the code modules and test cases affected. If a test fails, we know which requirement evidence is missing.
+
+**Yael:** Is that what people mean by a V-model?
+
+**Amir:** The V-model is one useful way to visualize the relationship between definition on the left and integration and verification on the right. User needs lead to system requirements, architecture, module design and implementation; then tests climb back through unit, integration, system and acceptance levels. The exact lifecycle can be agile, iterative or hybrid. The key idea is not the shape of the letter V. It is that every level of design has a corresponding method of checking it.
+
+**Yael:** So a PLC project does not become "agile" just because we stopped writing requirements.
+
+**Amir:** Correct. Iteration is not an excuse for losing traceability. Short cycles are valuable when each cycle still has a baseline, reviewable change, reproducible test and known release state.
+
+## 12:00-17:00 | Reviews and static checks before the PLC ever runs
+
+**Yael:** What can we prove before dynamic testing?
+
+**Amir:** More than many teams realize. Start with design review. Are modes explicit? Are state transitions complete? Does each actuator have one software owner? Are permissives separate from trips? Are retained variables justified? Are timers and units named clearly? Are restart and initialization behaviors documented?
+
+**Yael:** Then code review.
+
+**Amir:** Yes. A second engineer can catch logic that the author no longer sees. Reviews should ask concrete questions, not just "looks good." Who can write this variable? What happens on the first scan? What happens if an input stays true? Can this timer overflow or remain latched? Is there a default case? What happens when a communication quality bit changes? Is the behavior different after warm restart and cold restart?
+
+**Yael:** PLCopen has Software Construction Guidelines for exactly this sort of industrial software discipline.
+
+**Amir:** Right. PLCopen's guidance covers rules, coding patterns, libraries and software quality metrics for IEC 61131-3 environments. Metrics can help identify complexity, duplication or maintainability risks, but a metric is a signal, not a universal pass/fail threshold.
+
+**Yael:** For example, a high cyclomatic complexity value can tell us a function block has too many decision paths.
+
+**Amir:** Yes, and deep nesting can tell us that a sequence should perhaps be expressed as explicit states rather than layers of IF statements. Static analysis can also find unused variables, type conversions, unreachable code, multiple writers or naming-rule violations, depending on the engineering environment.
+
+**Yael:** But static analysis cannot tell us that opening V-101 actually creates the correct hydraulic route.
+
+**Amir:** Exactly. Static techniques inspect the software artifact. Dynamic tests exercise behavior. We need both.
+
+## 17:00-23:00 | Build a test architecture, not a pile of test cases
+
+**Yael:** What levels of testing make sense for industrial control?
+
+**Amir:** Think in layers. At the bottom, **unit tests** check small functions or function blocks: scaling, alarm logic, state transitions, valve modules, calculation blocks. Next, **integration tests** check interfaces between modules: sequence to equipment module, controller to drive, recipe manager to setpoint validation. Then **system tests** exercise the complete controller application against simulated or real I/O. Finally, **acceptance tests** demonstrate agreed behavior to the owner or customer.
+
+**Yael:** And the same requirement might be checked at more than one level.
+
+**Amir:** Yes, but for different reasons. A valve block unit test can verify that commanded Open plus no feedback eventually raises a timeout. A system test verifies that a route timeout stops the transfer sequence and presents the correct operator message. A site test verifies that the actual actuator, wiring and process response behave as intended.
+
+**Yael:** How do we design good test cases?
+
+**Amir:** Do not only test nominal values. Use categories. **Boundary-value tests**: exactly at high limit, just below, just above. **State-transition tests**: Stop during Step 4, then Reset; Manual to Auto while the actuator is moving; power loss during a timer. **Fault-injection tests**: bad quality, stale data, disconnected network, missing valve feedback, drive not ready. **Concurrency tests**: two sequences request the same shared utility. **Persistence tests**: what survives restart, what resets, and what must be revalidated.
+
+**Yael:** That is where our fault scenario would appear.
+
+**Amir:** Exactly. The test would state initial state, injected fault, recovery action, expected outputs, forbidden outputs and timing. We also need a **test oracle**: a documented expected result. "The engineer watched it and it looked okay" is not a reproducible oracle.
+
+**Yael:** Should every test be automated?
+
+**Amir:** No. Automate tests that are repeatable, high-value and cheap to execute. Manual exploratory testing is valuable because experienced engineers notice combinations nobody wrote down. The strongest programs use both: scripted regression for known requirements and exploratory sessions to discover unknown failure modes.
+
+**Yael:** What about code coverage?
+
+**Amir:** Useful, but easy to misuse. Statement or branch coverage can show code that was never executed. It cannot prove the executed behavior was correct, nor that the requirements are complete. In control systems, **requirements coverage and state-transition coverage** are often more informative than a single percentage. Safety-related software may demand more rigorous structural coverage depending on the applicable standard and integrity target, but that belongs to the safety lifecycle, not a generic rule for every PLC project.
+
+## 23:00-26:00 | Timing, determinism and data quality are test dimensions too
+
+**Yael:** We have talked mostly about logical outcomes. What about timing? A sequence can produce the right result, but too late.
+
+**Amir:** Exactly. Industrial software has temporal requirements. If a reject gate must react before a product reaches the diverter, pass/fail includes response time. If a valve must be proven open before pump start, the test must check that the command remains inhibited until the proof arrives, not simply that the valve eventually opens.
+
+**Yael:** So a test record should include timestamps, not only final states.
+
+**Amir:** For timing-critical functions, yes. Measure end-to-end behavior: field event, input update, task execution, network transfer, output update and physical response. The PLC scan is only one piece. A slow remote-I/O update or drive reaction can dominate the result.
+
+**Yael:** And data quality from Episode 9 matters here as well.
+
+**Amir:** Very much. A test should distinguish Good, Bad, Uncertain or stale data according to the platform's model. Ask what the software does when the value is numerically plausible but its timestamp is old. Ask what happens when the quality recovers. Does the sequence resume automatically? Does it require re-proving permissives? Does the operator see that the value was substituted or forced?
+
+**Yael:** That last point is interesting. A forced input can make a FAT pass even while the physical feedback chain is incomplete.
+
+**Amir:** Which is why forces and overrides need explicit control. Record every force used during a test, remove it deliberately and include a final "no active forces" check. Otherwise the test environment can hide the very integration defect we are trying to discover.
+
+## 23:00-31:00 | Simulation: from mocked I/O to virtual commissioning
+
+**Yael:** Teams use the word simulation for everything from forcing one input to a full digital twin. Can we build a ladder?
+
+**Amir:** Yes. Level zero is **manual forcing or signal injection**. It is useful for commissioning, but forcing is not a complete simulation because the plant does not respond dynamically. Next is a **unit-test harness** that calls a block with known inputs. Then **software-in-the-loop**, where the controller application executes against a software model of the equipment or process.
+
+**Yael:** Then hardware-in-the-loop?
+
+**Amir:** Right. With **hardware-in-the-loop**, the real controller hardware and often the real network interfaces run against a simulated plant. That lets us test scan timing, I/O drivers, protocol behavior and actual controller configuration while keeping the physical process virtual.
+
+**Yael:** And virtual commissioning?
+
+**Amir:** Virtual commissioning usually means exercising the automation system against a model of the machine or plant before the real equipment is ready. The model may include kinematics, sensors, actuators, process dynamics, faults and operator interactions. For a packaging machine it may be a 3D physics model. For a process skid it may be a dynamic mass-and-energy model. The goal is to discover integration and sequence problems earlier.
+
+**Yael:** Is that automatically a digital twin?
+
+**Amir:** No. "Digital twin" has become a broad term. Standards such as ISO 23247 and IEC 62832 provide structured frameworks for manufacturing digital twins and digital-factory information. But a model used for virtual commissioning is only as trustworthy as its scope and fidelity. If the simulated valve moves in 200 milliseconds and the real valve takes six seconds, a sequence that passes simulation may fail in the field.
+
+**Yael:** So the model itself needs validation.
+
+**Amir:** Exactly. Define what the model is intended to represent. Is it checking boolean sequence logic? Then exact fluid dynamics may not matter. Is it tuning a pressure loop? Then time constants, dead time, nonlinearities and actuator limits matter greatly. Model fidelity should match the question we are using the model to answer.
+
+**Yael:** Can simulation test failures that would be expensive or dangerous in the real plant?
+
+**Amir:** That is one of its biggest advantages. You can repeat network dropout, sensor failure, drive faults, invalid recipes, stuck valves, delayed feedback and power-cycle scenarios without risking equipment or production. You can accelerate time for long batch sequences and run hundreds of regression scenarios overnight.
+
+**Yael:** But there is a trap: passing a simulator can create false confidence.
+
+**Amir:** Correct. Simulation shifts defects earlier; it does not eliminate site verification. Mechanical tolerances, real cable delays, instrument filtering, network topology, friction, backlash, heat loss and operator behavior still exist. Treat simulation as one evidence layer, not a substitute for reality.
+
+## 31:00-36:00 | FAT, FIT, SAT and SIT - what each test should prove
+
+**Yael:** Now let us place FAT and SAT into this hierarchy.
+
+**Amir:** IEC 62381:2024 is a useful process-industry reference because it defines requirements and checklists for FAT, an optional **Factory Integration Test**, SAT and **Site Integration Test**. The exact terminology used on a project may differ, but the separation is valuable.
+
+**Yael:** What should FAT prove?
+
+**Amir:** FAT should demonstrate as much of the automation specification as practical before shipment or site deployment. That includes software versions, I/O simulation, sequences, permissives, alarms, HMI behavior, reports, communications, redundancy where applicable, backups and recovery procedures. It is far cheaper to fix logic in the factory than during a production shutdown.
+
+**Yael:** What does FIT add?
+
+**Amir:** Integration. Maybe the PLC, SCADA, historian, package units and safety system come from different vendors. FIT can prove interfaces before all parties arrive on site. It is especially valuable when the site schedule is compressed.
+
+**Yael:** SAT then verifies the installed reality.
+
+**Amir:** Exactly. Real wiring, real instruments, actuator direction, ranges, network paths, motor rotation, valve action, time synchronization, permissions and site-specific integration. SAT is not merely repeating FAT. It addresses risks that only exist after installation.
+
+**Yael:** And SIT?
+
+**Amir:** Site Integration Test focuses on the integrated system at site: interfaces among packages, plant systems, utilities, external systems and sometimes operating procedures. Again, use the terminology defined by the project and applicable standard.
+
+**Yael:** What is the most common FAT mistake?
+
+**Amir:** Testing the script rather than the system. If the test procedure says, "Set input X; verify lamp Y," but never asks why that input would occur or what else should be inhibited, the test can become ceremonial. Good acceptance testing is requirement-based and risk-based. It includes negative tests and recovery, not only the planned production sequence.
+
+## 36:00-38:00 | A failed test is an engineering asset if it is controlled
+
+**Yael:** What happens when a FAT test fails? In practice, teams often fix it on the spot and keep moving.
+
+**Amir:** Fast fixes are sometimes necessary, but the failure must become a controlled defect. Give it an identifier, severity, reproduction steps, expected behavior, actual behavior, affected requirement and disposition. Then retest after the fix and decide what regression is needed.
+
+**Yael:** Why not just write "fixed" in the margin?
+
+**Amir:** Because six months later nobody remembers whether the fix changed one screen or a common sequence library. A defect record is part of the evidence chain. It also reveals patterns: repeated failures around restart logic, repeated naming errors, repeated timeouts. Those patterns can drive architecture improvements instead of endless local patches.
+
+**Yael:** And deviations?
+
+**Amir:** If a requirement is intentionally not met at handover, that should be an approved deviation with owner, risk, temporary controls if needed and closure plan. Acceptance should never depend on everyone quietly forgetting what failed.
+
+## 36:00-41:00 | Regression, versioning and proving a change is safe
+
+**Yael:** The machine is commissioned. Six months later somebody asks for one small change. That is where regressions happen.
+
+**Amir:** Yes. Industrial systems accumulate behavior over years. A five-line change can affect a shared permissive, a common function block or a retained variable used by several sequences. We need **impact analysis** before the edit: what requirements, modules, interfaces and tests could be affected?
+
+**Yael:** Then version control.
+
+**Amir:** Source code, configuration, HMI, drive parameters, recipes, network configuration and documentation should have controlled versions or at least controlled baselines. A release should have a unique identifier, change record, test evidence and backup that can actually be restored.
+
+**Yael:** "Latest program on the engineer's laptop" is not a release process.
+
+**Amir:** Correct. A strong release answers: What changed? Who reviewed it? Which tests passed? Which known issues remain? What software and firmware versions were used? What is the rollback plan? What exact file is running in the controller now?
+
+**Yael:** Regression testing means rerunning old tests after a change.
+
+**Amir:** More precisely, rerunning a selected set of previously passed tests to detect unintended effects. The selection should be risk-based. If you change a common Valve block used by sixty valves, the regression scope is much larger than if you change one HMI label.
+
+**Yael:** This is where automated simulation becomes valuable.
+
+**Amir:** Exactly. A regression suite can run every commit or every release candidate. It can test startup, shutdown, stop-resume, power cycle, communication loss and hundreds of state transitions. Even if the controller vendor does not support a modern CI/CD pipeline, we can still adopt the mindset: repeatable build, repeatable tests, controlled artifact, traceable result.
+
+**Yael:** What should we archive after FAT or a major release?
+
+**Amir:** At minimum, the released source, compiled or downloadable artifact where applicable, controller and HMI versions, configuration exports, test procedures, executed results, defect list, approved deviations, backups and release notes. For systems with cybersecurity or functional-safety obligations, the required evidence can be more extensive.
+
+## 41:00-44:00 | Safety-related software: same principles, higher rigor
+
+**Yael:** We have intentionally stayed mostly in basic control. What changes when the software performs a safety function?
+
+**Amir:** The rigor increases and the lifecycle becomes normative. IEC 61508-3 specifies software requirements for E/E/PE safety-related systems, including lifecycle activities, validation information, modification control and supporting tools. For machinery, ISO 13849-1:2023 includes software within the design of safety-related parts of control systems, and ISO 13849-2:2012 remains the current published validation standard while its replacement is under development. IEC 62061's current consolidated edition also addresses design, integration, verification, validation and configuration management for machinery safety-related control systems.
+
+**Yael:** So a general FAT of the PLC does not automatically validate the safety functions.
+
+**Amir:** Correct. Safety functions need the evidence required by their applicable lifecycle: requirements, architecture, independence assumptions, fault behavior, verification and validation. We will go much deeper in Episode 13. For today, the important boundary is this: do not use a basic-control test plan as a substitute for safety validation.
+
+**Yael:** And equally, do not treat every normal sequence test as a safety test just because it stops a motor.
+
+**Amir:** Exactly.
+
+## 44:00-46:00 | Final checklist and bridge to cybersecurity
+
+**Yael:** Give me the checklist. We are about to release a new controller program. What do we ask?
+
+**Amir:** Twelve questions.
+
+1. Are the requirements specific enough to produce an observable pass/fail result?
+2. Can each important requirement be traced to code and at least one test?
+3. Have mode transitions, restart behavior and retained data been explicitly tested?
+4. Have we tested negative paths: bad quality, timeout, missing feedback, communication loss and invalid operator actions?
+5. Has a second engineer reviewed the architecture and code, not just the final HMI behavior?
+6. Are the test environment and software versions recorded so the result can be reproduced?
+7. Is the simulation model's intended fidelity documented, and has the model itself been checked against reality where needed?
+8. Have unit, integration, system and acceptance tests been separated so each level has a clear purpose?
+9. Did FAT include recovery and fault scenarios, not only the happy production sequence?
+10. Has the installed site been re-verified through SAT/SIT for wiring, actuators, networks and interfaces?
+11. Does every change have impact analysis, regression evidence, release identification and a tested rollback or restore path?
+12. If a function is safety-related, has it been handled under the applicable safety lifecycle rather than the general control test plan?
+
+**Yael:** My summary: software quality is not a clean program and it is not a thick FAT binder. It is the chain from requirement to evidence, with enough simulation and testing to make changes predictable.
+
+**Amir:** Exactly. The goal is not to claim that defects are impossible. The goal is to make defects easier to detect, failures easier to reproduce, and changes safer to introduce.
+
+**Yael:** And the next problem is that even perfectly tested software can be changed by the wrong person, through the wrong network path, at the wrong time.
+
+**Amir:** Which takes us to Episode 12: industrial cybersecurity. Zones and conduits, identities, remote access, secure development, patching, backups, incident response and the IEC 62443 lifecycle.
+
+**Yael:** Until then, do not ask only, "Did the test pass?" Ask, "What requirement did it prove, under what conditions, and can we prove it again tomorrow?"
+
+**Amir:** Thanks for listening to Control Edge.
