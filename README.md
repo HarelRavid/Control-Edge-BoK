@@ -8,7 +8,7 @@ PDF files are useful for presentation but poor as the primary source for AI revi
 
 ## Current status
 
-Episodes 1-10 are complete in Hebrew and English. Episode 11 is planned as **Software Quality, Simulation and Validation**.
+Episodes 1-11 are complete in Hebrew and English. Episode 12 is planned as **Industrial Cybersecurity**.
 
 ## Start here
 
