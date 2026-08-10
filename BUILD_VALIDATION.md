@@ -42,3 +42,10 @@
 - PDF QA: Hebrew 14 pages; English 15 pages; both rendered and visually checked.
 
 > Episode 10 adopts the repository's text-first modular workflow: `full.*.md` is the engineering dossier and `script.*.txt` is the canonical spoken script. Review both together.
+
+## Episode 11
+- he: PDF/master source=5721 words, canonical script=3467 words, notebooklm_prompt=353 words
+- en: PDF/master source=6239 words, canonical script=3794 words, notebooklm_prompt=359 words
+- PDF QA: Hebrew 13 pages; English 13 pages; both rendered, visually checked and passed PDF preflight.
+
+> Episode 11 continues the text-first modular workflow. `full.*.md` is the engineering dossier, `script.*.txt` is the canonical spoken dialogue, and `standards_and_sources.*.md` is the standards/source layer. Review these together rather than treating the PDF as the source of truth.
