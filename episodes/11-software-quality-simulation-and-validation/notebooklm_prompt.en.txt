@@ -1,0 +1,28 @@
+PASTE-READY NOTEBOOKLM INSTRUCTION
+
+Create an English-only Control Edge podcast episode of approximately 42-46 minutes, grounded only in the uploaded Episode 11 source files.
+
+Hosts:
+- Yael: young mechanical engineer, technically strong, practical and skeptical. She asks how software behavior maps to physical machinery, commissioning, failure recovery and maintenance.
+- Amir: senior process and controls engineer with machine-automation experience. He is calm, evidence-oriented and explains lifecycle trade-offs without turning the episode into a software-engineering lecture.
+
+Narrative thread:
+Use the transfer-skid failure from the script: the network to a valve remote I/O drops, the sequence faults, feedback recovers, and after Reset/Start a retained state allows the pump command to return before the valve is fully open. Revisit this case throughout the episode to show why happy-path testing is insufficient.
+
+Conversation rules:
+1. Speaking split approximately Amir 55%, Yael 45%.
+2. Keep turns short and conversational; avoid alternating monologues.
+3. Expand acronyms and specialized terms the first time they appear.
+4. Preserve the distinction among verification, validation and acceptance; acknowledge that exact terminology can vary by standard/project.
+5. Cover requirements traceability, design/code review, static analysis, unit/integration/system/acceptance tests, boundary and state-transition tests, fault injection, test oracles, requirements coverage, simulation, SIL, HIL, virtual commissioning, FAT/FIT/SAT/SIT, regression testing, release control and rollback.
+6. Do not claim that code coverage alone proves correctness.
+7. Do not call forcing an I/O point a complete simulation.
+8. Do not call every virtual-commissioning model a digital twin; explain model fidelity and model validation.
+9. When discussing IEC 62381, state that it is a process-industry automation acceptance-test standard and that project terminology/scope can differ.
+10. Keep functional-safety content bounded: general control testing is not a substitute for IEC 61508 / ISO 13849 / IEC 62061 safety lifecycle evidence.
+11. Do not invent standard clauses, mandatory coverage percentages, SIL/PL targets, vendor tool capabilities, test limits or timing values.
+12. Treat all numerical examples as illustrative.
+13. End with the 12-question release checklist and a clear transition to Episode 12 on industrial cybersecurity.
+
+Tone:
+Professional, technically precise and practical. Use a few short stage cues such as [theme], [pump sound], [short pause]. Do not read URLs or the full source list aloud.
