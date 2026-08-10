@@ -1,0 +1,28 @@
+הנחיה מוכנה להדבקה ל-NOTEBOOKLM
+
+צור פרק פודקאסט בעברית בלבד של Control Edge, באורך משוער של 42-46 דקות, המבוסס אך ורק על קובצי המקור של פרק 11 שהועלו.
+
+מגישים:
+- יעל: מהנדסת מכונות צעירה, חזקה טכנית, פרקטית וספקנית. היא שואלת כיצד התנהגות תוכנה מתחברת למכונה הפיזית, Commissioning, Recovery מתקלות ותחזוקה.
+- אמיר: מהנדס תהליך ובקרה ותיק עם ניסיון באוטומציית מכונות. רגוע, מבוסס-ראיות, ומסביר Trade-Offs של מחזור החיים בלי להפוך את הפרק להרצאת תוכנה.
+
+חוט מקשר:
+השתמש בתקלת סקיד ההעברה מהתסריט: תקשורת ל-Remote I/O של שסתום נופלת, ה-Sequence עובר Fault, ה-Feedback חוזר, ולאחר Reset/Start State שנשמר מאפשר לפקודת המשאבה לחזור לפני שהשסתום פתוח לגמרי. חזור למקרה לאורך הפרק כדי להראות למה Happy-Path Testing אינו מספיק.
+
+כללי שיחה:
+1. חלוקת דיבור בקירוב: אמיר 55%, יעל 45%.
+2. שמור על תורות דיבור קצרים וטבעיים; הימנע ממונולוגים מתחלפים.
+3. פתח ראשי תיבות ומונחים מקצועיים בהופעה הראשונה.
+4. שמור על ההבחנה בין Verification, Validation ו-Acceptance, וציין שהמינוח המדויק תלוי בתקן ובפרויקט.
+5. כסה Requirements Traceability, Design/Code Review, Static Analysis, Unit/Integration/System/Acceptance Tests, Boundary Tests, State-Transition Tests, Fault Injection, Test Oracle, Requirements Coverage, Simulation, SIL, HIL, Virtual Commissioning, FAT/FIT/SAT/SIT, Regression Testing, Release Control ו-Rollback.
+6. אל תטען ש-Code Coverage לבדו מוכיח נכונות.
+7. אל תציג I/O Forcing כסימולציה מלאה.
+8. אל תקרא לכל Model של Virtual Commissioning בשם Digital Twin; הסבר Fidelity ו-Validation של המודל.
+9. כאשר מוזכר IEC 62381, הסבר שזה תקן לתעשיית התהליך לבדיקות קבלה של מערכות אוטומציה וש-Scope והמינוח בפרויקט מסוים יכולים להיות שונים.
+10. שמור את Functional Safety בגבולות הנכונים: בדיקות Basic Control אינן תחליף לראיות מחזור החיים לפי IEC 61508 / ISO 13849 / IEC 62061.
+11. אל תמציא סעיפי תקן, אחוזי Coverage מחייבים, יעדי SIL/PL, יכולות כלי Vendor, גבולות Test או זמני תגובה.
+12. כל מספר בדוגמה הוא להמחשה בלבד.
+13. סיים בצ'קליסט 12 השאלות ובמעבר ברור לפרק 12 על Industrial Cybersecurity.
+
+סגנון:
+מקצועי, מדויק ופרקטי. השתמש במעט הערות במה כגון [מוזיקה], [משאבה], [השהיה קצרה]. אל תקריא URLs או את רשימת המקורות המלאה.
