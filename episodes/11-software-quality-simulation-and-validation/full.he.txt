@@ -1,0 +1,99 @@
+CONTROL EDGE - פרק 11
+איכות תוכנה, Simulation ו-Validation
+איך מוכיחים שתוכנת בקרה באמת מוכנה לפגוש את המכונה והמפעל
+
+קהל יעד: מהנדסי מכונות, תהליך, ייצור, מכשור ובקרה ואינטגרטורים
+משך יעד: 42-46 דקות
+סטטוס: הושלם
+
+מטרת הפרק
+הפרק מסביר כיצד מהנדסים מוכיחים שתוכנת בקרה תעשייתית מתנהגת נכון לפני ואחרי Deployment. המוקד אינו Code Style אלא שרשרת הראיות: Requirement -> Implementation -> Test -> Acceptance -> Release -> Change.
+
+המקרה המרכזי
+סקיד העברה עבר FAT רגיל בהצלחה. בזמן Commissioning התקשורת ל-Remote I/O של שסתום היציאה נופלת לשלוש שניות. ה-Feedback של השסתום הופך ל-Bad, ה-Sequence עובר Fault והמשאבה נעצרת. התקשורת חוזרת. המפעיל לוחץ Reset ו-Start. בגלל שה-Transfer State נשמר כ-Retentive, פקודת המשאבה חוזרת לפני שהשסתום פתוח לגמרי. ה-Happy Path עבד, אבל Transition של Fault-Recovery לא נבדק.
+
+השאלות ההנדסיות המרכזיות
+1. מהי איכות תוכנה במערכת בקרה תעשייתית?
+2. מה ההבדל המעשי בין Verification, Validation ו-Acceptance?
+3. איך כותבים Requirement שניתן לקבוע עבורו Pass/Fail ברור?
+4. איך מחברים Traceability בין Requirement, קוד ו-Test Evidence?
+5. אילו תקלות ניתן למצוא ב-Design Review, Code Review ו-Static Analysis לפני הרצה?
+6. מה המטרה של Unit, Integration, System ו-Acceptance Tests?
+7. איך בודקים Boundary Values, State Transitions, Communication Faults, Bad Data Quality, Restart ו-Retained Data?
+8. מהו Test Oracle ולמה "זה נראה בסדר" אינו מספיק?
+9. למה Code Coverage לבדו אינו מוכיח Correctness?
+10. מה ההבדל בין Software-in-the-Loop, Hardware-in-the-Loop ו-Virtual Commissioning?
+11. כמה מדויק Simulation Model צריך להיות ביחס לשאלה ההנדסית?
+12. מה FAT, FIT, SAT ו-SIT צריכים להוכיח כל אחד?
+13. איך מנהלים Failed Tests, Defects ו-Deviations?
+14. איך Impact Analysis, Regression Testing, Baselines ו-Rollback הופכים שינוי עתידי לבטוח יותר?
+15. איפה מסתיים Testing של Basic Control ומתחיל Functional-Safety Validation?
+
+שרשרת Evidence
+צורך -> User / Operational Requirements.
+התנהגות מערכת -> Functional Requirements, Sequences ו-Cause-and-Effect.
+ארכיטקטורה -> Modules, Interfaces ו-Ownership.
+מימוש -> PLC/DCS/HMI Code, Review ו-Static Analysis.
+Integration -> תוכנה וציוד שעובדים יחד, SIL/HIL.
+System -> אפליקציה מלאה תחת Normal ו-Abnormal Scenarios.
+Acceptance -> Evidence של FAT/FIT/SAT/SIT מול קריטריונים מוסכמים.
+Operation/Change -> Baseline מבוקר, Impact Analysis, Regression ו-Rollback.
+
+משפחות Test Design
+Nominal: Transfer רגיל עם כל ה-Permissives תקינים.
+Boundary: ערכים בדיוק בגבול או קרוב אליו.
+State Transition: Stop/Reset בזמן תנועת Actuator או מעבר בין States.
+Fault Injection: Bad Quality, Communication Dropout, Missing Feedback, Drive Not Ready.
+Persistence: Power Cycle או Warm Restart בזמן Sequence פעיל.
+Concurrency: שתי פונקציות מבקשות Resource משותף.
+Timing: Feedback מגיע ליד Timeout או תגובה מתרחשת סמוך ל-Deadline.
+Operator Action: פקודות Manual בזמן Auto Fault או Mode Transition.
+Regression: הרצה מחדש של Scenarios שעברו אחרי שינוי תוכנה.
+
+מדרג Simulation
+Manual Forcing / Signal Injection: שימושי ל-Commissioning, אבל אינו Plant Model דינמי.
+Unit-Test Harness: מפעיל Block קטן עם Inputs ידועים ו-Expected Outputs.
+Software-in-the-Loop: אפליקציית הבקר רצה מול Model תוכנתי.
+Hardware-in-the-Loop: Controller Hardware אמיתי רץ מול Plant Simulated.
+Virtual Commissioning: מערכת האוטומציה נבדקת מול Model של המכונה/התהליך לפני שהציוד האמיתי מוכן.
+Digital Twin: מונח ארכיטקטוני רחב יותר; לא כל Model של Virtual Commissioning הוא Digital Twin.
+
+כלל Model Fidelity
+ה-Model צריך להיות מדויק ביחס לשאלה שאותה הוא אמור לענות. בדיקת Boolean Sequence יכולה לדרוש States ו-Timing ריאליסטיים של Sensors ו-Actuators אך לא Thermodynamics מפורטת. בדיקת Controller Tuning עשויה לדרוש Process Gain, Dead Time, Time Constants, Nonlinearity ו-Actuator Limits. ה-Simulation Model עצמו צריך לעבור בדיקה מול המציאות במקומות שבהם ה-Fidelity שלו משפיע על המסקנה.
+
+שכבות Acceptance Test
+FAT: להוכיח כמה שיותר מה-Automation Specification לפני Deployment לאתר, כולל Normal Behavior, Faults, Recovery, Alarms, HMI, Communications, Backups וגרסאות תוכנה.
+FIT: שכבת Factory Integration אופציונלית כאשר כמה Packages או Vendors צריכים להוכיח Interfaces לפני האתר.
+SAT: אימות המציאות המותקנת - Wiring, Instruments, Ranges, Actuator Direction, Motor Rotation, Network Paths, Time Synchronization, Permissions ו-Site-Specific Behavior.
+SIT: אימות Interfaces משולבים באתר בין Packages, מערכות מפעל, Utilities ומערכות חיצוניות. המינוח בפרויקט מסוים יכול להשתנות.
+
+Release ו-Change Control
+כל Release צריך לענות: מה השתנה? מי ביצע Review? אילו Tests עברו? אילו Known Issues נשארו? אילו גרסאות Software/Firmware/Configuration כלולות? איזה Artifact רץ עכשיו? האם יש Backup שניתן לשחזר? מה Rollback Plan?
+
+Regression Scope צריך להיות Risk-Based. שינוי ב-Common Valve Function Block מחייב Regression רחב יותר משינוי Label בודד ב-HMI.
+
+גבול Safety
+Testing כללי של PLC/DCS אינו תחליף ל-Verification ו-Validation שנדרשים לפונקציות Safety-Related. תוכנת Safety צריכה לפעול לפי ה-Safety Lifecycle החל, למשל IEC 61508, ISO 13849 או IEC 62061 כאשר הם רלוונטיים. פרק 13 יעסוק בכך לעומק.
+
+צ'קליסט 12 שאלות לפני Release
+1. האם הדרישות Observable ו-Testable?
+2. האם כל דרישה חשובה Traceable לקוד ול-Test Evidence?
+3. האם Restart, Retained Data ו-Mode Transitions נבדקו?
+4. האם Negative Paths ו-Recovery נבדקו?
+5. האם מהנדס נוסף ביצע Review לארכיטקטורה ולקוד?
+6. האם Test Environment ו-Software Versions מתועדים?
+7. האם Fidelity של ה-Simulation Model מתועד ומאומת היכן שנדרש?
+8. האם Unit, Integration, System ו-Acceptance Tests מופרדים לפי מטרה?
+9. האם FAT כלל Faults ו-Recovery ולא רק Normal Operation?
+10. האם SAT/SIT אימתו מחדש Wiring, Actuators, Networks ו-Interfaces באתר?
+11. האם לכל שינוי יש Impact Analysis, Regression Evidence ו-Rollback?
+12. האם פונקציות Safety-Related מטופלות במסגרת Safety Lifecycle המתאים?
+
+קבצי ההפקה הקנוניים
+הדיאלוג המלא: script.he.txt
+הנחיית NotebookLM: notebooklm_prompt.he.txt
+תקנים ומקורות: standards_and_sources.he.md
+מסמך הנדסי לעריכה: full.he.md
+
+הפרק הבא
+פרק 12: Industrial Cybersecurity - Zones and Conduits, Identities, Remote Access, Secure Development, Patching, Backups, Incident Response ומחזור החיים של IEC 62443.
