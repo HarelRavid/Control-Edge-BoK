@@ -1,0 +1,270 @@
+## 00:00-03:00 | פתיחה - ה-Reset שאף אחד לא בדק
+
+[רעש מפעל חלש. משאבה מתחילה לעבוד, אקטואטור של שסתום זז ואז טון אזעקה קצר.]
+
+**אמיר:** דמייני סקיד העברה שכבר עבר FAT. הרצף הרגיל הורץ עשרות פעמים. במיכל A יש חומר, הנתיב למיכל B מיושר, משאבת ההעברה מתחילה לעבוד ובקר הספיקה מתייצב בדיוק במקום הנכון. ואז, בזמן Commissioning, מישהו מנתק לשלוש שניות את כבל הרשת ל-Remote I/O של שסתום היציאה.
+
+**יעל:** ה-Feedback של השסתום הופך ל-Bad, ה-Sequence עובר ל-Fault והמשאבה נעצרת. עד כאן נשמע נכון.
+
+**אמיר:** נכון. התחזוקה מחברת את הכבל מחדש. ה-Feedback חוזר להיות תקין. המפעיל לוחץ Reset ואז Start. התוכנה חוזרת ל-Step של ההעברה שנשמר כ-Retentive, פקודת המשאבה חוזרת מיד, אבל שסתום היציאה עדיין בדרך לפתיחה. במשך שתי שניות המשאבה דוחפת מול נתיב כמעט סגור.
+
+**יעל:** כלומר כל שורת קוד יכולה להיראות סבירה, הרצף הרגיל עבד, ועדיין הייתה במערכת התנהגות מסוכנת שמתחבאת בשילוב אחד של תקלה, Recovery ו-State שנשמר.
+
+**אמיר:** בדיוק. התקלה לא הייתה ב-Happy Path. היא הייתה במעבר בין מצבים חריגים. ולכן איכות תוכנה תעשייתית היא לא "ה-PLC רץ" ולא "בדקנו אותו ב-FAT". איכות אומרת שאנחנו יודעים להסביר מה התוכנה אמורה לעשות, להראות ראיות שכל התנהגות חשובה נבדקה, לשחזר את התוצאה, ולשנות את התוכנה בעתיד בלי להחזיר תקלות שכבר פתרנו.
+
+**יעל:** אז הפרק הזה הוא בעצם פרק על ראיות.
+
+**אמיר:** ראיות ומשמעת הנדסית. נדבר על דרישות, Verification, Validation, Review, Unit Tests, Simulation, Hardware-in-the-Loop, Virtual Commissioning, FAT, SAT, Regression Testing ו-Release Control. וכל הזמן נשאל שאלה אחת: איזו תקלה עדיין יכולה להתחבא בין הבדיקות שבחרנו לבצע?
+
+[פתיח מוזיקלי קצר.]
+
+## 03:00-07:00 | מהי איכות תוכנה במערכת תעשייתית
+
+**יעל:** כשמהנדסי תוכנה אומרים "איכות", הם יכולים להתכוון ל-Code Style, ל-Test Coverage או לכמות באגים בגרסה. למה מתכוון מהנדס בקרה?
+
+**אמיר:** קודם כול להתנהגות נכונה, אבל זה רק השלב הראשון. תוכנת בקרה תעשייתית צריכה גם תזמון צפוי, דיאגנוסטיקה, יכולת Recovery, תחזוקתיות, Testability ושינוי מבוקר. מכונה שעובדת רק כשהמתכנת המקורי עומד לידה היא לא מערכת תוכנה איכותית.
+
+**יעל:** וגם קוד יפה מאוד שמפעיל את השסתום הלא נכון הוא עדיין קוד לא נכון.
+
+**אמיר:** בדיוק. כדאי להפריד בין שלושה מושגים. הראשון הוא **Verification** - האם מימשנו נכון את ההתנהגות שהוגדרה. השני הוא **Validation** - האם המערכת המשולבת באמת עונה לצורך התפעולי בסביבה האמיתית שלה. השלישי הוא **Acceptance** - האם הצדדים בפרויקט הסכימו שהמערכת שהודגמה עומדת בקריטריונים החוזיים למסירה.
+
+**יעל:** ויש תקנים וחברות שמשתמשים במילים האלה קצת אחרת.
+
+**אמיר:** נכון. לא מתווכחים על מונח בלי לבדוק את התקן והגדרות הפרויקט. אבל ההבחנה ההנדסית חשובה: אפשר לאמת Function Block מול הדרישות שלו, ועדיין המערכת הפיזית השלמה צריכה Validation מול המכונה, הצנרת, התהליך והמפעיל.
+
+**יעל:** כלומר איכות תוכנה לא נוצרת בסוף על ידי בדיקות.
+
+**אמיר:** נכון. בדיקות מייצרות מידע. הן לא מצילות דרישות עמומות, Interfaces לא מתועדים או ארכיטקטורה שבה חמישה Routine-ים שונים כותבים לאותה פקודה. איכות נבנית לאורך מחזור החיים: דרישות, ארכיטקטורה, מימוש, Review, בדיקה, Integration, Release, Commissioning, תפעול ושינוי.
+
+**יעל:** זה מחזיר אותנו לפרק 7 ולעיקרון של Software Owner יחיד לכל Output פיזי.
+
+**אמיר:** בדיוק. ארכיטקטורה טובה יוצרת גבולות שאפשר לבדוק. אם Module של Pump מחזיק את הפקודה למשאבה, ה-Sequence מבקש הפעלה ושכבת Interlock יכולה למנוע אותה, אפשר לבדוק כל אחריות בנפרד. אם כל Routine כותב ישירות ל-Motor Output, מרחב המצבים נהיה קשה מאוד להבנה.
+
+## 07:00-12:00 | דרישה טובה היא חוזה שאפשר לבדוק
+
+**יעל:** נחזור לסקיד שלנו. איזו דרישה הייתה יכולה למנוע את תקלת ה-Reset?
+
+**אמיר:** כמה דרישות. דרישה חלשה אומרת: "המשאבה תתחיל כאשר המפעיל לוחץ Start". דרישה חזקה יותר אומרת: "משאבת ההעברה יכולה להתחיל רק כאשר הנתיב המבוקש הוכח כפתוח, איכות המכשור הנדרש תקינה, ה-Drive במצב Ready וה-Sequence נמצא ב-State שמותר להתחיל ממנו". ואז מוסיפים Recovery: "לאחר אובדן וחזרת Feedback של שסתום, העברה אוטומטית לא תחודש לפני בדיקה מחדש והוכחה של כל ה-Permissives של הנתיב".
+
+**יעל:** זו כבר כמעט בדיקה מוכנה.
+
+**אמיר:** בדיוק. דרישה שימושית צריכה להיות Observable. היא מגדירה Trigger, תנאים, התנהגות צפויה, זמן תגובה אם הוא רלוונטי ו-Failure Response. ב-Sequences, State Diagram וטבלת Transitions הרבה פעמים ניתנים לבדיקה טוב יותר מפרוזה בלבד. ב-Interlocks, Cause-and-Effect Matrix מחבר בין כל Cause לפעולה. בלולאות אנלוגיות צריך להגדיר Ranges, Quality Handling, Limits ו-Mode Behavior.
+
+**יעל:** איפה Requirement IDs עוזרים?
+
+**אמיר:** ב-Traceability. נותנים לדרישות חשובות מזהים יציבים. ואז Test T-042 יכול לומר שהוא מאמת את REQ-TR-017 ואת REQ-TR-021. אם דרישה משתנה, אנחנו מוצאים את Modules הקוד ואת הבדיקות שמושפעים. אם Test נכשל, יודעים לאיזו דרישה חסרה ראיה.
+
+**יעל:** זה מה שאנשים מתכוונים אליו כשאומרים V-Model?
+
+**אמיר:** ה-V-Model הוא דרך טובה להמחיש את הקשר בין הגדרה בצד אחד לבין Integration ו-Verification בצד השני. צורך של משתמש הופך ל-System Requirements, אחר כך לארכיטקטורה, Module Design ומימוש; ואז מטפסים חזרה דרך Unit, Integration, System ו-Acceptance Tests. מחזור החיים יכול להיות Iterative או Agile. העיקר הוא לא צורת האות V, אלא שלכל רמת תכן תהיה דרך מתאימה לבדוק אותה.
+
+**יעל:** אז פרויקט PLC לא הופך ל-Agile רק כי הפסקנו לכתוב דרישות.
+
+**אמיר:** בדיוק. איטרציה מהירה לא מחליפה Traceability. היא טובה כאשר בכל Cycle עדיין יש Baseline, שינוי שאפשר לבצע עליו Review, Test שניתן לשחזר וגרסת Release ידועה.
+
+## 12:00-17:00 | Review ו-Static Checks לפני שה-PLC בכלל רץ
+
+**יעל:** מה אפשר לבדוק עוד לפני Dynamic Testing?
+
+**אמיר:** הרבה. מתחילים ב-Design Review. האם Modes מפורשים? האם כל State Transition מוגדר? האם לכל Actuator יש Software Owner יחיד? האם Permissives מופרדים מ-Trips? האם כל Retentive Variable מוצדק? האם Timers ויחידות נקראים בצורה ברורה? האם Restart ו-Initialization מתועדים?
+
+**יעל:** ואז Code Review.
+
+**אמיר:** כן. מהנדס שני יכול לראות דברים שהכותב כבר הפסיק לראות. Review טוב לא שואל רק "נראה בסדר?" אלא שאלות קונקרטיות: מי יכול לכתוב למשתנה הזה? מה קורה ב-First Scan? מה קורה אם Input נשאר True? האם Timer יכול להישאר Latched? האם יש Default Case? מה קורה כש-Communication Quality משתנה? האם ההתנהגות אחרי Warm Restart שונה מ-Cold Restart?
+
+**יעל:** ל-PLCopen יש Software Construction Guidelines בדיוק בשביל המשמעת הזו בסביבת IEC 61131-3.
+
+**אמיר:** נכון. ההנחיות עוסקות ב-Rules, Coding Patterns, Libraries ומדדי איכות תוכנה. Metrics יכולים לעזור לזהות Complexity, Duplication או סיכון לתחזוקתיות, אבל הם Signal - לא סף Pass/Fail אוניברסלי.
+
+**יעל:** למשל Cyclomatic Complexity גבוה יכול להראות ש-Function Block מכיל יותר מדי מסלולי החלטה.
+
+**אמיר:** כן. Nesting עמוק יכול לרמוז שעדיף לייצג רצף כ-States מפורשים במקום שכבות של IF. Static Analysis יכול גם למצוא Unused Variables, Type Conversions, קוד שלא ניתן להגיע אליו, Multiple Writers או הפרות Naming, תלוי בסביבת הפיתוח.
+
+**יעל:** אבל Static Analysis לא יכול לדעת שפתיחת V-101 באמת יוצרת את הנתיב ההידראולי הנכון.
+
+**אמיר:** בדיוק. Static Techniques בודקות את ארטיפקט התוכנה. Dynamic Tests בודקים התנהגות. צריך את שניהם.
+
+## 17:00-23:00 | לבנות Test Architecture - לא ערימת Test Cases
+
+**יעל:** אילו רמות בדיקה מתאימות למערכת בקרה תעשייתית?
+
+**אמיר:** נחשוב בשכבות. בתחתית **Unit Tests** לפונקציות או Function Blocks קטנים: Scaling, Alarm Logic, State Transition, Valve Module, Calculation Block. מעליהם **Integration Tests** שבודקים Interfaces: Sequence מול Equipment Module, בקר מול Drive, Recipe Manager מול Setpoint Validation. אחר כך **System Tests** שמריצים את אפליקציית הבקר המלאה מול I/O מדומה או אמיתי. ולבסוף **Acceptance Tests** שמדגימים התנהגות מוסכמת ללקוח או לבעל המערכת.
+
+**יעל:** אותה דרישה יכולה להיבדק בכמה רמות.
+
+**אמיר:** כן, אבל מסיבות שונות. Unit Test ל-Valve Block יכול לוודא ש-Open Command בלי Feedback מייצר Timeout. System Test בודק שה-Timeout עוצר Transfer Sequence ומציג הודעה נכונה למפעיל. בדיקת Site בודקת שהאקטואטור, החיווט והתגובה האמיתית מתנהגים כפי שתוכנן.
+
+**יעל:** איך מתכננים Test Cases טובים?
+
+**אמיר:** לא בודקים רק ערכים נומינליים. יש קטגוריות. **Boundary Values**: בדיוק בגבול גבוה, קצת מתחת וקצת מעל. **State Transitions**: Stop באמצע Step 4 ואז Reset; Manual ל-Auto בזמן שהשסתום בתנועה; אובדן מתח בזמן Timer. **Fault Injection**: Bad Quality, Stale Data, ניתוק רשת, Missing Valve Feedback, Drive Not Ready. **Concurrency**: שני Sequences מבקשים Utility משותף. **Persistence**: מה נשמר אחרי Restart, מה מתאפס ומה חייב לעבור Revalidation.
+
+**יעל:** וכאן בדיוק הייתה נתפסת התקלה שלנו.
+
+**אמיר:** נכון. הבדיקה הייתה מגדירה Initial State, Fault שנזרק, Recovery Action, Outputs צפויים, Outputs שאסור שיופיעו ותזמון. צריך גם **Test Oracle** - תוצאה צפויה מתועדת. "המהנדס הסתכל וזה נראה בסדר" היא לא תוצאה שניתן לשחזר.
+
+**יעל:** צריך להפוך כל בדיקה לאוטומטית?
+
+**אמיר:** לא. מבצעים Automation לבדיקות שהן חוזרות, בעלות ערך גבוה וזולות להרצה. Exploratory Testing ידני חשוב מאוד כי מהנדסים מנוסים מוצאים שילובים שאף אחד לא כתב מראש. תוכנית חזקה משתמשת בשניהם: Regression Scripted לדרישות ידועות ו-Exploratory Sessions למציאת מצבי כשל שלא חשבנו עליהם.
+
+**יעל:** ומה לגבי Code Coverage?
+
+**אמיר:** שימושי, אבל קל מאוד לעשות בו שימוש לא נכון. Statement או Branch Coverage יכולים להראות קוד שמעולם לא הורץ. הם לא מוכיחים שההתנהגות שהורצה הייתה נכונה או שהדרישות שלמות. בעולם הבקרה, **Requirements Coverage ו-State-Transition Coverage** יכולים להיות משמעותיים יותר מאחוז יחיד. בתוכנת Safety יכולים להיות כללי Structural Coverage מחמירים יותר לפי התקן וה-SIL או PL, אבל זו דרישה של Safety Lifecycle ולא כלל גורף לכל PLC.
+
+## 23:00-26:00 | גם Timing, Determinism ו-Data Quality הם ממדי בדיקה
+
+**יעל:** דיברנו בעיקר על תוצאה לוגית. מה לגבי Timing? Sequence יכול להגיע לתוצאה הנכונה - אבל מאוחר מדי.
+
+**אמיר:** בדיוק. לתוכנה תעשייתית יש גם דרישות זמן. אם Reject Gate חייב להגיב לפני שהמוצר מגיע למסיט, Pass/Fail כולל Response Time. אם שסתום חייב להיות Proven Open לפני התנעת משאבה, הבדיקה צריכה להוכיח שהפקודה נשארת חסומה עד שה-Proof מגיע - לא רק שהשסתום נפתח בסוף.
+
+**יעל:** כלומר ב-Test Record לפעמים צריך Timestamps ולא רק Final State.
+
+**אמיר:** בפונקציות רגישות לזמן, כן. בודקים End-to-End: אירוע בשטח, Input Update, Task Execution, Network Transfer, Output Update והתגובה הפיזית. Scan Time של ה-PLC הוא רק חלק מהשרשרת. Remote I/O איטי או תגובת Drive יכולים לשלוט בזמן הכולל.
+
+**יעל:** וגם Data Quality מפרק 9 חוזר לכאן.
+
+**אמיר:** מאוד. בדיקה צריכה להבחין בין Good, Bad, Uncertain או Stale Data לפי המודל של הפלטפורמה. שואלים מה התוכנה עושה כאשר המספר נראה הגיוני אבל ה-Timestamp ישן. מה קורה כאשר ה-Quality חוזר? האם ה-Sequence חוזר אוטומטית? האם צריך להוכיח מחדש Permissives? האם המפעיל רואה שהערך היה Substituted או Forced?
+
+**יעל:** Force יכול לגרום ל-FAT לעבור בזמן שהשרשרת הפיזית בכלל לא שלמה.
+
+**אמיר:** ולכן Forces ו-Overrides צריכים Control מפורש. מתעדים כל Force שנעשה בבדיקה, מסירים אותו באופן יזום ומסיימים ב-Check של "No active forces". אחרת סביבת הבדיקה יכולה להסתיר בדיוק את בעיית ה-Integration שאותה ניסינו למצוא.
+
+## 23:00-31:00 | Simulation - מ-Forced I/O ועד Virtual Commissioning
+
+**יעל:** בתעשייה משתמשים במילה Simulation לכל דבר, מ-Force ל-Input אחד ועד Digital Twin מלא. בוא נבנה סולם.
+
+**אמיר:** רמה אפס היא **Manual Forcing או Signal Injection**. זה שימושי ב-Commissioning, אבל זה לא Model שלם כי התהליך לא מגיב דינמית. אחר כך יש **Unit-Test Harness** שמפעיל Block עם Inputs ידועים. מעליו **Software-in-the-Loop**, שבו אפליקציית הבקר רצה מול Model תוכנתי של המכונה או התהליך.
+
+**יעל:** ואז Hardware-in-the-Loop?
+
+**אמיר:** נכון. ב-**Hardware-in-the-Loop** הבקר הפיזי האמיתי, ולעיתים גם Interfaces אמיתיים של הרשת, עובדים מול Plant Simulated. כך בודקים Scan Timing, Drivers, Protocol Behavior ו-Controller Configuration אמיתיים בלי להפעיל את התהליך הפיזי.
+
+**יעל:** ומה זה Virtual Commissioning?
+
+**אמיר:** בדרך כלל זו הרצה של מערכת האוטומציה מול Model של המכונה או המפעל לפני שהציוד האמיתי מוכן. ה-Model יכול לכלול Kinematics, Sensors, Actuators, Process Dynamics, Faults ואינטראקציות מפעיל. במכונת אריזה זה יכול להיות מודל 3D פיזיקלי. בסקיד תהליכי זה יכול להיות מודל דינמי של Mass and Energy Balance. המטרה היא למצוא בעיות Integration ו-Sequence מוקדם יותר.
+
+**יעל:** וזה אוטומטית Digital Twin?
+
+**אמיר:** לא. "Digital Twin" הפך למונח רחב. סדרת ISO 23247 ו-IEC 62832 נותנות מסגרות מסודרות ל-Digital Twin ול-Digital Factory במערכות ייצור. אבל Model שמשמש ל-Virtual Commissioning אמין רק ביחס ל-Scope ול-Fidelity שלו. אם השסתום המדומה מגיע לפתיחה מלאה ב-200 מילישניות והשסתום האמיתי לוקח שש שניות, Sequence שעובר בסימולציה יכול להיכשל בשטח.
+
+**יעל:** כלומר גם את ה-Model צריך לבצע עליו Validation.
+
+**אמיר:** בדיוק. מגדירים מה הוא אמור לייצג. אם המטרה היא לבדוק Boolean Sequence Logic, אולי Fluid Dynamics מדויקים לא קריטיים. אם אנחנו מכוונים Pressure Loop, Time Constants, Dead Time, Nonlinearity ו-Actuator Limits כן קריטיים. Fidelity צריך להתאים לשאלה שהמודל אמור לענות עליה.
+
+**יעל:** Simulation מאפשר לבדוק תקלות שיהיו יקרות או מסוכנות במערכת האמיתית.
+
+**אמיר:** וזה אחד היתרונות הגדולים. אפשר לחזור שוב ושוב על Network Dropout, Sensor Failure, Drive Fault, Invalid Recipe, Stuck Valve, Delayed Feedback ו-Power Cycle בלי לסכן ציוד או ייצור. אפשר להאיץ זמן של Batch ארוך ולהריץ מאות תרחישי Regression בלילה.
+
+**יעל:** אבל יש מלכודת - Pass בסימולטור יכול לייצר ביטחון מופרז.
+
+**אמיר:** נכון. Simulation מזיזה Defects מוקדם יותר. היא לא מבטלת Site Verification. Tolerances מכניים, Cable Delays, Instrument Filtering, Topology, Friction, Backlash, Heat Loss והתנהגות מפעיל עדיין קיימים. Simulation היא שכבת ראיה - לא תחליף למציאות.
+
+## 31:00-36:00 | FAT, FIT, SAT ו-SIT - מה כל שכבה צריכה להוכיח
+
+**יעל:** עכשיו נמקם FAT ו-SAT בתוך ההיררכיה הזו.
+
+**אמיר:** IEC 62381:2024 הוא Reference חשוב לתעשיית התהליך כי הוא מגדיר Requirements ו-Checklists ל-FAT, ל-**Factory Integration Test** אופציונלי, ל-SAT ול-**Site Integration Test**. בפרויקט מסוים המונחים יכולים להיות שונים, אבל ההפרדה ההנדסית שימושית מאוד.
+
+**יעל:** מה FAT צריך להוכיח?
+
+**אמיר:** כמה שיותר מה-Automation Specification לפני Deployment לאתר. גרסאות תוכנה, I/O Simulation, Sequences, Permissives, Alarms, HMI, Reports, Communications, Redundancy אם קיימת, Backups ו-Recovery Procedures. הרבה יותר זול לתקן Logic במפעל של האינטגרטור מאשר בזמן Shutdown באתר.
+
+**יעל:** מה FIT מוסיף?
+
+**אמיר:** Integration. למשל PLC, SCADA, Historian, Package Units ו-Safety System מגיעים מספקים שונים. FIT יכול להוכיח Interfaces לפני שכל האנשים והציוד מגיעים לשטח. זה חשוב במיוחד כשה-Site Schedule קצר.
+
+**יעל:** SAT בודק את המציאות המותקנת.
+
+**אמיר:** בדיוק. Wiring אמיתי, Instruments, כיוון Actuator, Ranges, Network Paths, Motor Rotation, Valve Action, Time Synchronization, Permissions ואינטגרציה ספציפית לאתר. SAT הוא לא רק Repeat של FAT. הוא מטפל בסיכונים שקיימים רק אחרי Installation.
+
+**יעל:** ו-SIT?
+
+**אמיר:** Site Integration Test מתמקד במערכת המשולבת באתר: Interfaces בין Packages, מערכות המפעל, Utilities, External Systems ולעיתים גם Operating Procedures. שוב - משתמשים במונחים שהוגדרו בחוזה ובתקן הרלוונטי.
+
+**יעל:** מה טעות ה-FAT הכי נפוצה?
+
+**אמיר:** לבדוק את ה-Test Script במקום את המערכת. אם הפרוצדורה אומרת "הפעל Input X ובדוק Lamp Y" אבל אף פעם לא שואלת למה Input X קורה ומה עוד חייב להיות חסום, הבדיקה הופכת לטקס. Acceptance Test טוב מבוסס דרישה וסיכון. הוא כולל Negative Tests ו-Recovery, לא רק רצף ייצור תקין.
+
+## 36:00-38:00 | Test שנכשל הוא נכס הנדסי - אם מנהלים אותו נכון
+
+**יעל:** מה עושים כשבדיקת FAT נכשלת? במציאות הרבה פעמים מתקנים במקום וממשיכים.
+
+**אמיר:** לפעמים חייבים לתקן מהר, אבל הכשל צריך להפוך ל-Defect מבוקר. נותנים Identifier, Severity, שלבי Reproduction, Expected Behavior, Actual Behavior, Requirement מושפע ו-Disposition. אחרי התיקון מבצעים Retest ומחליטים איזה Regression נדרש.
+
+**יעל:** למה לא פשוט לכתוב "תוקן" בצד של הטופס?
+
+**אמיר:** כי אחרי חצי שנה אף אחד לא זוכר אם התיקון שינה Label אחד או Library משותפת לכל ה-Sequences. Defect Record הוא חלק משרשרת הראיות. והוא גם חושף Patterns: שוב ושוב Restart Logic, שוב Naming, שוב Timeouts. מה-Patterns האלה אפשר לשפר Architecture במקום לבצע אינסוף Patches מקומיים.
+
+**יעל:** ומה לגבי Deviations?
+
+**אמיר:** אם Requirement בכוונה לא מתקיים בזמן Handover, זו צריכה להיות Deviation מאושרת עם Owner, Risk, Temporary Controls אם נדרשים ו-Closure Plan. Acceptance לא אמור להסתמך על זה שכולם ישכחו בשקט מה נכשל.
+
+## 36:00-41:00 | Regression, Versioning ואיך מוכיחים ששינוי לא החזיר תקלה
+
+**יעל:** המכונה עובדת. אחרי חצי שנה מבקשים "שינוי קטן". שם מתחילות Regressions.
+
+**אמיר:** נכון. מערכות תעשייתיות צוברות Behavior במשך שנים. שינוי של חמש שורות יכול להשפיע על Permissive משותף, Function Block משותף או Retained Variable שמשמש כמה Sequences. לפני השינוי צריך **Impact Analysis**: אילו Requirements, Modules, Interfaces ו-Tests יכולים להיות מושפעים?
+
+**יעל:** ואז Version Control.
+
+**אמיר:** Source Code, Configuration, HMI, Drive Parameters, Recipes, Network Configuration ותיעוד צריכים גרסאות או לפחות Baselines מבוקרים. Release צריך Identifier ייחודי, Change Record, Test Evidence ו-Backup שבאמת יודעים לשחזר.
+
+**יעל:** "הגרסה האחרונה על הלפטופ של המהנדס" היא לא Release Process.
+
+**אמיר:** בדיוק. Release טוב עונה על השאלות: מה השתנה? מי עשה Review? אילו Tests עברו? אילו Known Issues נשארו? אילו Software ו-Firmware Versions היו בשימוש? מה Rollback Plan? ואיזה קובץ בדיוק רץ עכשיו בבקר?
+
+**יעל:** Regression Testing הוא להריץ שוב בדיקות שכבר עברו אחרי שינוי.
+
+**אמיר:** באופן מדויק יותר - להריץ מחדש Set של בדיקות שעברו בעבר כדי לזהות Side Effects שלא התכוונו אליהם. ה-Scope צריך להיות Risk-Based. אם משנים Valve Block משותף לשישים שסתומים, Scope ה-Regression גדול בהרבה משינוי טקסט ב-HMI.
+
+**יעל:** כאן Automation של Simulation באמת משתלם.
+
+**אמיר:** בדיוק. Regression Suite יכול לרוץ בכל Commit או בכל Release Candidate. הוא יכול לבדוק Startup, Shutdown, Stop-Resume, Power Cycle, Communication Loss ומאות State Transitions. גם אם Vendor של ה-PLC לא תומך ב-CI/CD מודרני, אפשר לאמץ את העיקרון: Build שניתן לשחזר, Tests שחוזרים על עצמם, Artifact מבוקר ותוצאה Traceable.
+
+**יעל:** מה שומרים אחרי FAT או Release גדול?
+
+**אמיר:** לפחות Source ששוחרר, Artifact להורדה אם רלוונטי, גרסאות PLC ו-HMI, Configuration Exports, Test Procedures, תוצאות שבוצעו בפועל, Defect List, Deviations מאושרות, Backups ו-Release Notes. במערכות עם דרישות Cybersecurity או Functional Safety יהיו לעיתים דרישות Evidence נוספות.
+
+## 41:00-44:00 | תוכנת Safety - אותם עקרונות, רמת משמעת גבוהה יותר
+
+**יעל:** עד עכשיו נשארנו בעיקר ב-Basic Control. מה משתנה כשהתוכנה מבצעת Safety Function?
+
+**אמיר:** רמת הקפדנות עולה ומחזור החיים הופך לנורמטיבי. IEC 61508-3 מגדיר דרישות Software למערכות E/E/PE Safety-Related, כולל Lifecycle Activities, Validation Information, Modification Control ו-Supporting Tools. במכונות, ISO 13849-1:2023 כולל Software בתוך תכנון SRP/CS, ו-ISO 13849-2:2012 עדיין התקן המפורסם הנוכחי ל-Validation בזמן שהמהדורה הבאה נמצאת בפיתוח. IEC 62061 במהדורה המאוחדת הנוכחית מטפל גם ב-Design, Integration, Verification, Validation ו-Configuration Management של Safety-Related Control Systems למכונות.
+
+**יעל:** כלומר FAT כללי של ה-PLC לא מאמת אוטומטית את פונקציות הבטיחות.
+
+**אמיר:** נכון. Safety Functions צריכות את ה-Evidence שנדרש במחזור החיים הרלוונטי: Requirements, Architecture, Assumptions של Independence, Fault Behavior, Verification ו-Validation. נעמיק בזה בפרק 13. להיום הגבול חשוב: לא משתמשים ב-Test Plan של Basic Control כתחליף ל-Safety Validation.
+
+**יעל:** וגם לא קוראים לכל בדיקת Sequence "בדיקת Safety" רק כי בסוף המנוע נעצר.
+
+**אמיר:** בדיוק.
+
+## 44:00-46:00 | צ'קליסט סופי והמעבר לסייבר
+
+**יעל:** תן את הצ'קליסט. אנחנו רגע לפני Release חדש לבקר. מה שואלים?
+
+**אמיר:** שתים-עשרה שאלות.
+
+1. האם הדרישות ספציפיות מספיק כדי לייצר Pass/Fail שאפשר לראות ולמדוד?
+2. האם כל דרישה חשובה Traceable לקוד ולפחות ל-Test אחד?
+3. האם Mode Transitions, Restart Behavior ו-Retained Data נבדקו במפורש?
+4. האם בדקנו Negative Paths: Bad Quality, Timeout, Missing Feedback, Communication Loss ו-Invalid Operator Actions?
+5. האם מהנדס נוסף ביצע Review לארכיטקטורה ולקוד - לא רק להתנהגות ב-HMI?
+6. האם גרסת התוכנה ו-Test Environment מתועדים כך שאפשר לשחזר את התוצאה?
+7. האם ה-Fidelity המיועד של ה-Simulation Model מתועד, והאם המודל עצמו הושווה למציאות במקום שבו זה נדרש?
+8. האם Unit, Integration, System ו-Acceptance Tests מופרדים כך שלכל רמה יש מטרה ברורה?
+9. האם FAT כלל Fault ו-Recovery Scenarios ולא רק Happy Path של ייצור?
+10. האם האתר המותקן אומת מחדש ב-SAT/SIT עבור Wiring, Actuators, Networks ו-Interfaces?
+11. האם לכל שינוי יש Impact Analysis, Regression Evidence, Release ID ונתיב Rollback או Restore שנבדק?
+12. אם פונקציה היא Safety-Related - האם היא טופלה לפי Safety Lifecycle ולא לפי Test Plan כללי של Basic Control?
+
+**יעל:** הסיכום שלי: איכות תוכנה היא לא תוכנית נקייה ולא קלסר FAT עבה. היא השרשרת מהדרישה עד הראיה, עם מספיק Simulation ו-Testing כדי ששינוי עתידי יהיה צפוי.
+
+**אמיר:** בדיוק. המטרה היא לא לטעון שאי אפשר שיהיו Bugs. המטרה היא למצוא אותם מוקדם יותר, לשחזר כשל מהר יותר ולהכניס שינויים בצורה בטוחה יותר.
+
+**יעל:** והבעיה הבאה היא שגם תוכנה שנבדקה בצורה מושלמת יכולה להשתנות על ידי האדם הלא נכון, דרך נתיב הרשת הלא נכון ובזמן הלא נכון.
+
+**אמיר:** וזה לוקח אותנו לפרק 12: **Industrial Cybersecurity**. Zones and Conduits, Identities, Remote Access, Secure Development, Patching, Backups, Incident Response ומחזור החיים של IEC 62443.
+
+**יעל:** עד אז, אל תשאלו רק "האם הבדיקה עברה?". תשאלו "איזו דרישה היא הוכיחה, באילו תנאים, והאם נוכל להוכיח אותה שוב מחר?"
+
+**אמיר:** תודה שהאזנתם ל-Control Edge.
